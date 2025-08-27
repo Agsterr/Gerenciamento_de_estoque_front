@@ -1,0 +1,6 @@
+<div *ngIf="!isAdmin" class="error">{{ errorMessage }}</div>
+<div *ngIf="isAdmin && usuarios.length > 0">
+  <ul>
+    <li *ngFor="let usuario of usuarios">{{ usuario.nome }}</li>
+  </ul>
+</div>

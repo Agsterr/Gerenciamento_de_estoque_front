@@ -1,0 +1,699 @@
+/*
+  SCSS moderno e funcional para o componente de consumidores
+  Paleta: azul, cinza, verde, branco
+*/
+
+$primary: #2563eb;
+$secondary: #0ea5e9;
+$success: #22c55e;
+$danger: #ef4444;
+$info: #38bdf8;
+$bg: #f6f8fa;
+$white: #fff;
+$dark: #1e293b;
+$light: #f1f5f9;
+$border: #e2e8f0;
+$disabled: #cbd5e1;
+$radius: 10px;
+$shadow: 0 2px 12px 0 rgba(30,41,59,0.07);
+$transition: 0.18s cubic-bezier(.4,0,.2,1);
+
+// Regras globais para garantir visibilidade do texto
+.consumidor-container {
+  * {
+    color: inherit;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #1e293b !important;
+  }
+  
+  p, span, div, td, th {
+    color: #1e293b !important;
+  }
+}
+
+// Container principal
+.consumidor-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+  min-height: 100vh;
+  color: #1e293b !important;
+}
+
+// Estilos para a seção de resumo
+.summary-section {
+  margin-bottom: 24px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 200px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.1);
+  }
+  
+  i {
+    font-size: 2rem;
+    color: #3b82f6;
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+    padding: 12px;
+    border-radius: 50%;
+  }
+  
+  .summary-content {
+    display: flex;
+    flex-direction: column;
+    
+    .summary-label {
+      font-size: 0.875rem;
+      color: #64748b;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .summary-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 4px;
+    }
+  }
+}
+
+// Header
+.header-consumidor {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  
+  h2 {
+    color: #1e293b !important;
+    font-size: 1.875rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    i {
+      color: #3b82f6;
+      font-size: 1.5rem;
+    }
+  }
+  
+  .acoes-header {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  
+  .botao-listar, .botao-adicionar {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    
+    i {
+      font-size: 1rem;
+    }
+  }
+  
+  .botao-listar {
+    background: #64748b;
+    color: white;
+    
+    &:hover {
+      background: #475569;
+    }
+  }
+  
+  .botao-adicionar {
+    background: #3b82f6;
+    color: white;
+    
+    &:hover {
+      background: #2563eb;
+    }
+  }
+}
+
+// Mensagens de feedback
+.mensagem-feedback {
+  padding: 16px 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  &.sucesso {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    color: #15803d;
+    border: 1px solid #22c55e;
+    
+    i {
+      color: #16a34a;
+    }
+  }
+  
+  &.erro {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    color: #991b1b;
+    border: 1px solid #ef4444;
+    
+    i {
+      color: #dc2626;
+    }
+  }
+  
+  i {
+    font-size: 1.2rem;
+  }
+}
+
+// Spinner
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Main content
+.main-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  overflow: hidden;
+}
+
+// Card lista
+.card-lista {
+  padding: 24px;
+}
+
+// Busca
+.busca-container {
+  margin-bottom: 24px;
+}
+
+.busca-input-wrapper {
+  position: relative;
+  max-width: 400px;
+  
+  i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    font-size: 1rem;
+  }
+}
+
+.campo-busca {
+  width: 100%;
+  padding: 12px 16px 12px 48px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  color: #1e293b !important;
+  transition: all 0.2s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  &::placeholder {
+    color: #64748b;
+  }
+}
+
+// Tabela
+.tabela-consumidores {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.tabela-consumidores th,
+.tabela-consumidores td {
+  padding: 16px 12px;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+  color: #1e293b !important;
+}
+
+.tabela-consumidores th {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white !important;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  i {
+    margin-right: 8px;
+    color: #fbbf24;
+  }
+}
+
+.tabela-consumidores tbody tr {
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background-color: #f8fafc;
+  }
+  
+  &:nth-child(even) {
+    background-color: #f9fafb;
+    
+    &:hover {
+      background-color: #f1f5f9;
+    }
+  }
+}
+
+.tabela-consumidores td {
+  color: #1e293b !important;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.acoes-tabela {
+  text-align: center;
+}
+
+// Estilo de botões de ação (copiado de entregas)
+.btn {
+  padding: 0.7em 1.7em;
+  border: none;
+  border-radius: $radius;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.05rem;
+  background: $primary;
+  color: $white;
+  box-shadow: 0 2px 8px 0 rgba(30,41,59,0.08);
+  outline: none;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+}
+
+.btn-success { background: $success; }
+.btn-info    { background: $info; }
+.btn-primary { background: $primary; }
+.btn-danger  { background: $danger; }
+.btn-sm      { padding: 0.45em 1.1em; font-size: 0.97em; }
+
+.btn:disabled {
+  background: $disabled;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.btn:focus-visible, .btn:focus {
+  outline: 2px solid $secondary;
+  outline-offset: 2px;
+}
+
+.btn:hover:not(:disabled), .btn:active:not(:disabled) {
+  filter: brightness(0.93);
+  box-shadow: 0 4px 18px 0 rgba(30,41,59,0.13);
+  transform: translateY(-2px) scale(1.03);
+}
+
+// Estilo específico para os botões na tabela
+.tabela-consumidores .btn {
+  margin: 0 2px;
+}
+
+// Paginação
+.pagination-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 32px;
+  flex-wrap: wrap;
+  padding: 20px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.pagination-info-left {
+  min-width: 180px;
+  font-size: 1rem;
+  color: #1e293b !important;
+  font-weight: 500;
+}
+
+.pagination-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.pagination-info-right {
+  min-width: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  color: #1e293b !important;
+}
+
+.btn-pag, .pagina-numero {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  padding: 8px 12px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+  
+  &:disabled {
+    background: #cbd5e1;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  &:hover:not(:disabled) {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.pagina-numero.ativa {
+  background: #1d4ed8 !important;
+  color: white !important;
+}
+
+.select-page-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  color: #1e293b !important;
+  font-weight: 500;
+  
+  select {
+    padding: 6px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    background: white;
+    color: #1e293b;
+    font-size: 0.9rem;
+  }
+}
+
+// Card formulário
+.card-form {
+  padding: 24px;
+}
+
+.titulo-form {
+  color: #1e293b !important;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  
+  i {
+    color: #3b82f6;
+  }
+}
+
+.form-adicionar {
+  max-width: 600px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #1e293b !important;
+    font-size: 0.9rem;
+  }
+  
+  input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    color: #1e293b !important;
+    transition: all 0.2s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    &.invalido {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+  }
+  
+  .erro-campo {
+    color: #ef4444;
+    font-size: 0.8rem;
+    margin-top: 4px;
+    font-weight: 500;
+  }
+}
+
+.botoes-form {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.botao-salvar, .botao-cancelar {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  i {
+    font-size: 1rem;
+  }
+}
+
+.botao-salvar {
+  background: #22c55e;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #16a34a;
+  }
+}
+
+.botao-cancelar {
+  background: #64748b;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #475569;
+  }
+}
+
+.spinner-mini {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .header-consumidor {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+    
+    .acoes-header {
+      justify-content: center;
+    }
+  }
+  
+  .tabela-consumidores {
+    font-size: 0.8rem;
+    
+    th, td {
+      padding: 8px 6px;
+    }
+  }
+  
+  .pagination-bar {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .botoes-form {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .tabela-consumidores, .tabela-consumidores thead, .tabela-consumidores tbody, .tabela-consumidores tr, .tabela-consumidores th, .tabela-consumidores td {
+    display: block;
+    width: 100%;
+  }
+  
+  .tabela-consumidores thead {
+    display: none;
+  }
+  
+  .tabela-consumidores tbody tr {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: white;
+    padding: 12px;
+    color: #1e293b !important;
+  }
+  
+  .tabela-consumidores td {
+    border: none;
+    position: relative;
+    padding-left: 50%;
+    min-height: 32px;
+    font-size: 0.9rem;
+    color: #1e293b !important;
+    
+    &:before {
+      position: absolute;
+      left: 8px;
+      top: 0;
+      width: 48%;
+      white-space: nowrap;
+      font-weight: 600;
+      color: #3b82f6;
+      content: attr(data-label);
+    }
+  }
+  
+  .acoes-tabela {
+    text-align: left;
+    padding-left: 8px !important;
+    
+    &:before {
+      content: "Ações: ";
+    }
+  }
+}

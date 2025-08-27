@@ -1,0 +1,175 @@
+.modal-container {
+  min-width: 500px;
+  max-width: 600px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px 0;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 0;
+    color: #1976d2;
+    font-size: 1.5rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    i {
+      color: #4caf50;
+    }
+  }
+
+  button {
+    color: #666;
+    
+    &:hover {
+      color: #1976d2;
+    }
+  }
+}
+
+.modal-content {
+  padding: 0 24px;
+  max-height: 70vh;
+  overflow-y: auto;
+
+  .form-row {
+    margin-bottom: 16px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  mat-form-field {
+    .mat-form-field-wrapper {
+      padding-bottom: 0;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 16px;
+
+  button {
+    min-width: 120px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+
+    &[type="button"] {
+      color: #666;
+      border: 1px solid #ddd;
+
+      &:hover {
+        background-color: #f5f5f5;
+        color: #333;
+      }
+    }
+
+    &[type="submit"] {
+      background-color: #1976d2;
+      color: white;
+
+      &:hover:not(:disabled) {
+        background-color: #1565c0;
+      }
+
+      &:disabled {
+        background-color: #ccc;
+        color: #666;
+      }
+    }
+
+    i {
+      font-size: 14px;
+    }
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .modal-container {
+    min-width: 90vw;
+    max-width: 95vw;
+  }
+
+  .modal-header {
+    padding: 12px 16px 0;
+
+    h2 {
+      font-size: 1.25rem;
+    }
+  }
+
+  .modal-content {
+    padding: 0 16px;
+  }
+
+  .modal-actions {
+    padding: 12px 16px;
+    flex-direction: column;
+
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+// Animações
+.modal-container {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Estados de loading
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+// Estilos para campos com erro
+mat-form-field.ng-invalid.ng-touched {
+  .mat-form-field-outline {
+    color: #f44336;
+  }
+}
+
+// Estilos para campos válidos
+mat-form-field.ng-valid.ng-touched {
+  .mat-form-field-outline {
+    color: #4caf50;
+  }
+} 

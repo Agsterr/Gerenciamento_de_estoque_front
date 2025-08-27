@@ -1,0 +1,276 @@
+<div class="entrega-container">
+  <h2>Gerenciamento de Entregas</h2>
+
+  <!-- Resumo das Entregas -->
+  <div class="summary-section" *ngIf="totalEntregasOrganizacao > 0">
+    <div class="summary-card">
+      <i class="fas fa-truck"></i>
+      <div class="summary-content">
+        <span class="summary-label">Total de Entregas</span>
+        <span class="summary-value">{{ totalEntregasOrganizacao }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensagens de Sucesso e Erro -->
+  <div *ngIf="mensagem" class="alert alert-success">
+    <i class="fas fa-check-circle"></i> {{ mensagem }}
+  </div>
+  <div *ngIf="mensagemErro" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle"></i> {{ mensagemErro }}
+  </div>
+
+  <!-- Botões de Ação -->
+  <div class="action-buttons">
+    <button (click)="showAddForm = !showAddForm; mensagem=''; mensagemErro=''; novaEntrega={}" class="btn btn-success">
+      <i [class]="showAddForm ? 'fas fa-times-circle' : 'fas fa-plus-circle'"></i>
+      {{ showAddForm ? 'Cancelar Adição' : 'Adicionar Nova Entrega' }}
+    </button>
+
+    <!-- Botão para mostrar o componente BuscaEntregaComponent -->
+    <button (click)="showBuscaEntrega = !showBuscaEntrega; showAddForm = false;" class="btn btn-info">
+      <i class="fas fa-search"></i> Buscar Entregas
+    </button>
+  </div>
+
+  <!-- Exibe o componente BuscaEntregaComponent -->
+  <app-busca-entrega *ngIf="showBuscaEntrega" (buscar)="onBuscarEntregas($event)"></app-busca-entrega>
+
+  <!-- Lista de Entregas -->
+  <div class="list-section">
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (input)="applyFilter()"
+      placeholder="Buscar entregas..."
+      class="search-input"
+    />
+
+    <!-- Formulário de Adição de Entrega -->
+    <div *ngIf="showAddForm" class="add-form-section">
+      <h3>
+        <i class="fas fa-pencil-alt"></i>
+        Registrar Nova Entrega
+      </h3>
+      <form (ngSubmit)="submitAddForm()" #entregaForm="ngForm">
+        <!-- Seleção de Produto -->
+        <div class="form-group">
+          <label for="produto">
+            <i class="fas fa-box"></i>
+            Produto:
+          </label>
+          <select
+            id="produto"
+            name="produtoId"
+            [(ngModel)]="novaEntrega.produtoId"
+            required
+            class="form-control"
+          >
+            <option value="" disabled selected>Selecione um produto</option>
+            <option *ngFor="let produto of produtos" [value]="produto.id">
+              {{ produto.id }} - {{ produto.nome }} ({{ produto.quantidade }} em estoque)
+            </option>
+          </select>
+        </div>
+
+        <!-- Seleção de Consumidor -->
+        <div class="form-group">
+          <label for="consumidor">
+            <i class="fas fa-user-circle"></i>
+            Consumidor:
+          </label>
+          <select
+            id="consumidor"
+            name="consumidorId"
+            [(ngModel)]="novaEntrega.consumidorId"
+            required
+            class="form-control"
+          >
+            <option value="" disabled selected>Selecione um consumidor</option>
+            <option *ngFor="let consumidor of consumidores" [value]="consumidor.id">
+              {{ consumidor.nome }} - CPF: {{ consumidor.cpf }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Quantidade -->
+        <div class="form-group">
+          <label for="quantidade">
+            <i class="fas fa-calculator"></i>
+            Quantidade:
+          </label>
+          <input
+            type="number"
+            id="quantidade"
+            name="quantidade"
+            [(ngModel)]="novaEntrega.quantidade"
+            required
+            min="1"
+            class="form-control"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-success" [disabled]="!entregaForm.form.valid">
+          <i class="fas fa-check"></i>
+          Registrar Entrega
+        </button>
+      </form>
+    </div>
+
+    <!-- Formulário de Edição de Entrega -->
+    <div *ngIf="showEditForm" class="edit-form-section">
+      <h3>
+        <i class="fas fa-pencil-alt"></i>
+        Editar Entrega
+      </h3>
+      <form (ngSubmit)="submitEditForm()" #editForm="ngForm">
+        <!-- Seleção de Produto -->
+        <div class="form-group">
+          <label for="produto">
+            <i class="fas fa-box"></i> Produto:
+          </label>
+          <select
+            id="produto"
+            name="produtoId"
+            [(ngModel)]="novaEntrega.produtoId"
+            required
+            class="form-control"
+          >
+            <option value="" disabled selected>Selecione um produto</option>
+            <option *ngFor="let produto of produtos" [value]="produto.id">
+              {{ produto.id }} - {{ produto.nome }} ({{ produto.quantidade }} em estoque)
+            </option>
+          </select>
+        </div>
+
+        <!-- Seleção de Consumidor -->
+        <div class="form-group">
+          <label for="consumidor">
+            <i class="fas fa-user-circle"></i> Consumidor:
+          </label>
+          <select
+            id="consumidor"
+            name="consumidorId"
+            [(ngModel)]="novaEntrega.consumidorId"
+            required
+            class="form-control"
+          >
+            <option value="" disabled selected>Selecione um consumidor</option>
+            <option *ngFor="let consumidor of consumidores" [value]="consumidor.id">
+              {{ consumidor.nome }} - CPF: {{ consumidor.cpf }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Quantidade -->
+        <div class="form-group">
+          <label for="quantidade">
+            <i class="fas fa-calculator"></i> Quantidade:
+          </label>
+          <input
+            type="number"
+            id="quantidade"
+            name="quantidade"
+            [(ngModel)]="novaEntrega.quantidade"
+            required
+            min="1"
+            class="form-control"
+          />
+        </div>
+
+        <button type="submit" class="btn btn-success" [disabled]="!editForm.form.valid">
+          <i class="fas fa-check"></i>
+          Atualizar Entrega
+        </button>
+      </form>
+    </div>
+  </div>
+
+<!-- Tabela de Entregas -->
+<table class="entrega-table">
+  <colgroup>
+    <col style="width: 70px">
+    <col style="width: 18%">
+    <col style="width: 18%">
+    <col style="width: 18%">
+    <col style="width: 10%">
+    <col style="width: 12%">  <!-- Total -->
+    <col style="width: 18%">
+    <col style="width: 120px">
+  </colgroup>
+  <thead>
+    <tr>
+      <th><i class="fas fa-hashtag"></i> ID</th>
+      <th><i class="fas fa-user"></i> Consumidor</th>
+      <th><i class="fas fa-box"></i> Produto</th>
+      <th><i class="fas fa-truck"></i> Entregador</th>
+      <th><i class="fas fa-layer-group"></i> Quantidade</th>
+      <th><i class="fas fa-clock"></i> Horário</th>
+      <th><i class="fas fa-dollar-sign"></i> Total</th>
+      <th><i class="fas fa-cogs"></i> Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let entrega of filteredEntregas">
+      <td data-label="ID">{{ entrega.id }}</td>
+      <td data-label="Consumidor">{{ entrega.nomeConsumidor }}</td>
+      <td data-label="Produto">{{ entrega.nomeProduto }}</td>
+      <td data-label="Entregador">{{ entrega.nomeEntregador }}</td>
+      <td data-label="Quantidade">{{ entrega.quantidade }}</td>
+      <td data-label="Horário">{{ formatarDataHoraBrasil(entrega.horarioEntrega) }}</td>
+      
+      <!-- Coluna Total -->
+      <td data-label="Total">
+        {{ formatarTotal(entrega) }}
+      </td>
+
+  
+
+      
+      <td data-label="Ações">
+        <button (click)="editEntrega(entrega.id)" class="btn btn-primary btn-sm" title="Editar">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button (click)="deleteEntrega(entrega.id)" class="btn btn-danger btn-sm" title="Deletar">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+  <!-- Paginação -->
+  <div class="pagination-bar" *ngIf="totalPages > 0">
+    <div class="pagination-info-left">
+      Página {{ currentPage + 1 }} de {{ totalPages }} ({{ totalElements || 0 }} entregas)
+    </div>
+    <div class="pagination-row">
+      <button type="button" (click)="paginaAnterior()" title="Página anterior" [disabled]="currentPage === 0" class="btn-pag">
+        <i class="fas fa-chevron-left" aria-hidden="true"></i>
+      </button>
+      <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+        <button
+          type="button"
+          class="pagina-numero"
+          [class.ativa]="i === currentPage"
+          (click)="irParaPagina(i)"
+          [disabled]="i === currentPage">
+          {{ i + 1 }}
+        </button>
+      </ng-container>
+      <button type="button" (click)="proximaPagina()" title="Próxima página" [disabled]="currentPage >= totalPages - 1 || totalPages === 0" class="btn-pag">
+        <i class="fas fa-chevron-right" aria-hidden="true"></i>
+      </button>
+    </div>
+    <div class="pagination-info-right">
+      <div class="select-page-size">
+        <label for="pageSizeSelect">Exibir</label>
+        <select id="pageSizeSelect" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+          <option *ngFor="let size of pageSizeOptions" [ngValue]="size">{{ size }}</option>
+        </select>
+        <span>por página</span>
+      </div>
+    </div>
+  </div>
+</div>

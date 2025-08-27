@@ -1,0 +1,143 @@
+<!-- src/app/components/categoria.component.html -->
+<div class="categoria-container">
+
+  <h2 class="titulo-lista">
+    <i class="fas fa-list-alt"></i> Lista de Categorias
+  </h2>
+
+  <!-- Resumo das Categorias -->
+  <div class="summary-section" *ngIf="totalElements > 0">
+    <div class="summary-card">
+      <i class="fas fa-list-alt"></i>
+      <div class="summary-content">
+        <span class="summary-label">Total de Categorias</span>
+        <span class="summary-value">{{ totalElements }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mensagens de Sucesso ou Erro -->
+  <div *ngIf="mensagem" class="alert alert-success">
+    <i class="fas fa-check-circle"></i> {{ mensagem }}
+  </div>
+  <div *ngIf="mensagemErro" class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle"></i> {{ mensagemErro }}
+  </div>
+
+  <!-- Botão para Adicionar Nova Categoria -->
+  <div class="acoes-container">
+    <button (click)="toggleNovaCategoriaForm()" type="button" class="btn btn--primario">
+      <i class="fas fa-plus-circle"></i> Nova Categoria
+    </button>
+  </div>
+
+  <!-- Formulário de Criação -->
+  <div *ngIf="showNovaCategoriaInput" class="categoria-formulario">
+    <h3 class="titulo-form">
+      <i class="fas fa-folder-plus"></i> Criar Nova Categoria
+    </h3>
+
+    <form [formGroup]="categoriaForm" (ngSubmit)="criarCategoria()" aria-labelledby="form-nova-categoria">
+      <div class="form-group">
+        <label for="nome">
+          <i class="fas fa-tag"></i> Nome da Categoria:
+        </label>
+        <input
+          id="nome"
+          type="text"
+          formControlName="nome"
+          placeholder="Digite o nome"
+          class="categoria-formulario__input"
+          aria-required="true"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="descricao">
+          <i class="fas fa-align-left"></i> Descrição:
+        </label>
+        <input
+          id="descricao"
+          type="text"
+          formControlName="descricao"
+          placeholder="Digite uma descrição"
+          class="categoria-formulario__input"
+        />
+      </div>
+
+      <button type="submit" [disabled]="categoriaForm.invalid" class="btn btn--salvar">
+        <i class="fas fa-save"></i> Salvar
+      </button>
+    </form>
+  </div>
+
+  <!-- Lista de Categorias -->
+  <div class="categoria-lista">
+    <h3><i class="fas fa-folder-open"></i> Categorias Existentes</h3>
+
+    <!-- Campo de busca (estilo Entregas) -->
+    <input
+      type="text"
+      [(ngModel)]="searchTerm"
+      (input)="applyFilter()"
+      placeholder="Buscar categorias..."
+      class="search-input"
+    />
+
+    <table class="entrega-table" role="table">
+      <colgroup>
+        <col style="width: 70%">
+        <col style="width: 120px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th><i class="fas fa-tag"></i> Nome</th>
+          <th><i class="fas fa-cogs"></i> Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let categoria of filteredCategorias">
+          <td data-label="Nome">{{ categoria.nome }}</td>
+          <td data-label="Ações">
+            <button type="button" class="btn btn-danger btn-sm" (click)="deletarCategoria(categoria.id)" title="Excluir">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- Paginação -->
+    <div class="pagination-bar" *ngIf="totalPages > 0">
+      <div class="pagination-info-left">
+        Página {{ number + 1 }} de {{ totalPages }} ({{ totalElements }} categorias)
+      </div>
+      <div class="pagination-row">
+        <button class="btn-pag" (click)="paginaAnterior()" [disabled]="number === 0">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+          <button
+            class="pagina-numero"
+            [class.ativa]="i === number"
+            (click)="carregarCategorias(i)"
+            [disabled]="i === number">
+            {{ i + 1 }}
+          </button>
+        </ng-container>
+        <button class="btn-pag" (click)="proximaPagina()" [disabled]="number + 1 >= totalPages">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      <div class="pagination-info-right">
+        <div class="select-page-size">
+          <label for="pageSizeSelect">Exibir</label>
+          <select id="pageSizeSelect" [(ngModel)]="size" (change)="onPageSizeChange()">
+            <option *ngFor="let s of [10, 20, 30, 40]" [value]="s">{{s}}</option>
+          </select>
+          <span>por página</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

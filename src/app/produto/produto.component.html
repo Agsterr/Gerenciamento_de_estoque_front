@@ -1,0 +1,193 @@
+<!-- Cabeçalho fixo -->
+<header class="header-produto">
+  <h2><i class="fas fa-box"></i> Gestão de Produtos</h2>
+  <div class="acoes-header">
+    <button class="botao-listar" (click)="toggleList()" title="Ver lista de produtos">
+      <i class="fas fa-list"></i> Listar
+    </button>
+    <button class="botao-adicionar" (click)="toggleAddForm()" title="Adicionar novo produto">
+      <i class="fas fa-plus"></i> Novo
+    </button>
+  </div>
+</header>
+
+<!-- Resumo dos Produtos -->
+<div class="summary-section" *ngIf="totalElements > 0">
+  <div class="summary-card">
+    <i class="fas fa-box"></i>
+    <div class="summary-content">
+      <span class="summary-label">Total de Produtos</span>
+      <span class="summary-value">{{ totalElements }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Mensagens de feedback -->
+<div *ngIf="mensagem" class="alert alert-success">
+  <i class="fas fa-check-circle"></i> {{ mensagem }}
+</div>
+<div *ngIf="mensagemErro" class="alert alert-danger">
+  <i class="fas fa-exclamation-triangle"></i> {{ mensagemErro }}
+</div>
+
+<!-- Spinner de carregamento -->
+<div *ngIf="loading" class="spinner-overlay">
+  <div class="spinner"></div>
+</div>
+
+<div class="main-content">
+  <!-- Card Lista -->
+  <div class="card-lista" *ngIf="showList">
+    <div class="busca-container">
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="applyFilter()"
+        placeholder="Buscar produtos..."
+        class="search-input"
+      />
+    </div>
+    <table class="entrega-table">
+      <colgroup>
+        <col style="width: 70px">
+        <col style="width: 18%">
+        <col style="width: 22%">
+        <col style="width: 15%">
+        <col style="width: 10%">
+        <col style="width: 10%">
+        <col style="width: 10%">
+        <col style="width: 120px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th><i class="fas fa-hashtag"></i> ID</th>
+          <th><i class="fas fa-box"></i> Nome</th>
+          <th><i class="fas fa-align-left"></i> Descrição</th>
+          <th><i class="fas fa-list-alt"></i> Categoria</th>
+          <th><i class="fas fa-layer-group"></i> Quantidade</th>
+          <th><i class="fas fa-exclamation-circle"></i> Qtd. Mínima</th>
+          <th><i class="fas fa-dollar-sign"></i> Preço</th>
+          <th><i class="fas fa-cogs"></i> Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let produto of filteredProdutos">
+          <td data-label="ID">{{ produto.id }}</td>
+          <td data-label="Nome">{{ produto.nome }}</td>
+          <td data-label="Descrição">{{ produto.descricao }}</td>
+          <td data-label="Categoria">{{ produto.categoriaNome }}</td>
+          <td data-label="Quantidade">{{ produto.quantidade }}</td>
+          <td data-label="Qtd. Mínima">{{ produto.quantidadeMinima }}</td>
+          <td data-label="Preço">{{ produto.preco | currency:'BRL' }}</td>
+          <td data-label="Ações">
+            <button (click)="editProduto(produto)" class="btn btn-primary btn-sm" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button (click)="deleteProduto(produto.id)" class="btn btn-danger btn-sm" title="Excluir">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- Paginação -->
+  <div class="pagination-bar" *ngIf="totalPages > 0">
+    <div class="pagination-info-left">
+      Página {{ currentPage + 1 }} de {{ totalPages }} ({{ totalElements || 0 }} produtos)
+    </div>
+    <div class="pagination-row">
+      <button (click)="paginaAnterior()" [disabled]="currentPage === 0" class="btn-pag">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+        <button
+          class="pagina-numero"
+          [class.ativa]="i === currentPage"
+          (click)="irParaPagina(i)"
+          [disabled]="i === currentPage">
+          {{ i + 1 }}
+        </button>
+      </ng-container>
+      <button (click)="proximaPagina()" [disabled]="currentPage >= totalPages - 1 || totalPages === 0" class="btn-pag">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+    <div class="pagination-info-right">
+      <div class="select-page-size">
+        <label for="pageSizeSelect">Exibir</label>
+        <select id="pageSizeSelect" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+          <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+        </select>
+        <span>por página</span>
+      </div>
+    </div>
+  </div>
+</div>
+  <!-- Card Formulário -->
+  <div class="card-form" *ngIf="showAddForm">
+    <h3 class="titulo-form">
+      <i class="fas fa-box"></i>
+      {{ editingProduto ? 'Editar Produto' : 'Adicionar Produto' }}
+    </h3>
+    <form [formGroup]="produtoForm" (ngSubmit)="submitAddForm()" class="form-adicionar">
+      <div class="form-group">
+        <label for="nome"><i class="fas fa-tag"></i> Nome</label>
+        <input id="nome" type="text" formControlName="nome" required [class.invalido]="produtoForm.get('nome')?.invalid && produtoForm.get('nome')?.touched" />
+        <div class="erro-campo" *ngIf="produtoForm.get('nome')?.invalid && produtoForm.get('nome')?.touched">
+          Nome é obrigatório.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="descricao"><i class="fas fa-align-left"></i> Descrição</label>
+        <input id="descricao" type="text" formControlName="descricao" required [class.invalido]="produtoForm.get('descricao')?.invalid && produtoForm.get('descricao')?.touched" />
+        <div class="erro-campo" *ngIf="produtoForm.get('descricao')?.invalid && produtoForm.get('descricao')?.touched">
+          Descrição é obrigatória.
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="preco"><i class="fas fa-dollar-sign"></i> Preço</label>
+          <input id="preco" type="number" formControlName="preco" required step="0.01" [class.invalido]="produtoForm.get('preco')?.invalid && produtoForm.get('preco')?.touched" />
+          <div class="erro-campo" *ngIf="produtoForm.get('preco')?.invalid && produtoForm.get('preco')?.touched">
+            Preço é obrigatório.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="quantidade"><i class="fas fa-sort-numeric-up"></i> Quantidade</label>
+          <input id="quantidade" type="number" formControlName="quantidade" required [class.invalido]="produtoForm.get('quantidade')?.invalid && produtoForm.get('quantidade')?.touched" />
+          <div class="erro-campo" *ngIf="produtoForm.get('quantidade')?.invalid && produtoForm.get('quantidade')?.touched">
+            Quantidade é obrigatória.
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="quantidadeMinima"><i class="fas fa-exclamation-circle"></i> Qtd. Mínima</label>
+          <input id="quantidadeMinima" type="number" formControlName="quantidadeMinima" required [class.invalido]="produtoForm.get('quantidadeMinima')?.invalid && produtoForm.get('quantidadeMinima')?.touched" />
+          <div class="erro-campo" *ngIf="produtoForm.get('quantidadeMinima')?.invalid && produtoForm.get('quantidadeMinima')?.touched">
+            Quantidade mínima é obrigatória.
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="categoriaId"><i class="fas fa-list-alt"></i> Categoria</label>
+          <select id="categoriaId" formControlName="categoriaId" required [class.invalido]="produtoForm.get('categoriaId')?.invalid && produtoForm.get('categoriaId')?.touched">
+            <option value="">Selecione...</option>
+            <option *ngFor="let cat of categorias" [value]="cat.id">{{ cat.nome }}</option>
+          </select>
+          <div class="erro-campo" *ngIf="produtoForm.get('categoriaId')?.invalid && produtoForm.get('categoriaId')?.touched">
+            Categoria é obrigatória.
+          </div>
+        </div>
+      </div>
+      <div class="botoes-form">
+        <button type="submit" class="botao-salvar" [disabled]="produtoForm.invalid || loading">
+          <span *ngIf="!loading"><i class="fas fa-save"></i> {{ editingProduto ? 'Salvar' : 'Adicionar' }}</span>
+          <span *ngIf="loading" class="spinner-mini"></span>
+        </button>
+        <button type="button" class="botao-cancelar" (click)="toggleList()" [disabled]="loading">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,118 @@
+<div class="org-container">
+  <header class="org-header">
+    <div class="title-area">
+      <i class="fas fa-building"></i>
+      <h2>Organizações</h2>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn--primario" (click)="toggleCriar()">
+        <i class="fas" [ngClass]="criando ? 'fa-minus-circle' : 'fa-plus-circle'"></i>
+        {{ criando ? 'Fechar' : 'Nova Organização' }}
+      </button>
+      <button class="btn btn--neutro" (click)="listar()">
+        <i class="fas fa-rotate"></i>
+        Atualizar
+      </button>
+    </div>
+  </header>
+
+  <section class="alerts">
+    <div *ngIf="mensagem" class="alert alert-success">
+      <i class="fas fa-check-circle"></i>
+      {{ mensagem }}
+    </div>
+    <div *ngIf="mensagemErro" class="alert alert-danger">
+      <i class="fas fa-exclamation-triangle"></i>
+      {{ mensagemErro }}
+    </div>
+  </section>
+
+  <section *ngIf="criando" class="org-formulario card">
+    <form [formGroup]="form" (ngSubmit)="criar()">
+      <div class="form-row">
+        <label for="nome">Nome</label>
+        <input id="nome" type="text" formControlName="nome" placeholder="Nome da organização" />
+        <div class="field-hint">
+          Máximo 100 caracteres
+        </div>
+        <div class="field-error" *ngIf="nomeCtrl?.invalid && (nomeCtrl?.dirty || nomeCtrl?.touched)">
+          <span *ngIf="nomeCtrl?.errors?.['required']">O nome é obrigatório.</span>
+          <span *ngIf="nomeCtrl?.errors?.['maxlength']">O nome pode ter no máximo 100 caracteres.</span>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn--neutro" (click)="toggleCriar()">
+          <i class="fas fa-times"></i>
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn--salvar" [disabled]="form.invalid">
+          <i class="fas fa-save"></i>
+          Salvar
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="org-lista card">
+    <div class="table-header">
+      <h3>Lista de Organizações</h3>
+    </div>
+
+    <div class="table-wrapper">
+      <table class="org-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Status</th>
+            <th class="th-acoes">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let org of orgs; trackBy: trackByOrg">
+            <td data-label="ID">{{ org.id }}</td>
+            <td data-label="Nome">
+              <ng-container *ngIf="editandoId !== org.id; else editTpl">
+                {{ org.nome }}
+              </ng-container>
+              <ng-template #editTpl>
+                <input type="text" #editInput [(ngModel)]="editNome" (keydown)="onEditKeydown($event, org)" />
+              </ng-template>
+            </td>
+            <td data-label="Status">
+              <span class="status" [class.ativo]="org.ativo" [class.inativo]="!org.ativo">
+                <i class="fas" [ngClass]="org.ativo ? 'fa-check-circle' : 'fa-ban'"></i>
+                {{ org.ativo ? 'Ativo' : 'Inativo' }}
+              </span>
+            </td>
+            <td data-label="Ações" class="acoes">
+              <div class="acoes-group" *ngIf="editandoId !== org.id; else edicaoAcoes">
+                <button class="btn btn--secundario" (click)="iniciarEdicao(org)">
+                  <i class="fas fa-edit"></i> Editar
+                </button>
+                <button class="btn" [ngClass]="org.ativo ? 'btn-danger' : 'btn-success'" (click)="alterarStatus(org)">
+                  <i class="fas" [ngClass]="org.ativo ? 'fa-ban' : 'fa-check'"></i>
+                  {{ org.ativo ? 'Desativar' : 'Ativar' }}
+                </button>
+              </div>
+              <ng-template #edicaoAcoes>
+                <button class="btn btn--salvar" (click)="salvarEdicao(org)">
+                  <i class="fas fa-save"></i> Salvar
+                </button>
+                <button class="btn btn--neutro" (click)="cancelarEdicao()">
+                  <i class="fas fa-times"></i> Cancelar
+                </button>
+              </ng-template>
+            </td>
+          </tr>
+          <tr *ngIf="orgs?.length === 0">
+            <td colspan="4" class="empty-state">
+              <i class="fas fa-folder-open"></i>
+              Nenhuma organização cadastrada.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>

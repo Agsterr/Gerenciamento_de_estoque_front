@@ -1,0 +1,150 @@
+<!-- Cabeçalho fixo -->
+<header class="header-consumidor">
+  <h2><i class="fas fa-users"></i> Gestão de Consumidores</h2>
+  <div class="acoes-header">
+    <button class="botao-listar" (click)="toggleList()" title="Ver lista de consumidores">
+      <i class="fas fa-list"></i> Listar
+    </button>
+    <button class="botao-adicionar" (click)="toggleAddForm()" title="Adicionar novo consumidor">
+      <i class="fas fa-plus"></i> Novo
+    </button>
+  </div>
+</header>
+
+<!-- Resumo dos Consumidores -->
+<div class="summary-section" *ngIf="totalConsumidoresOrganizacao > 0">
+  <div class="summary-card">
+    <i class="fas fa-users"></i>
+    <div class="summary-content">
+      <span class="summary-label">Total de Consumidores</span>
+      <span class="summary-value">{{ totalConsumidoresOrganizacao }}</span>
+    </div>
+  </div>
+</div>
+
+<!-- Mensagens de feedback -->
+<div *ngIf="mensagem" class="mensagem-feedback sucesso animate">
+  <i class="fas fa-check-circle"></i> {{ mensagem }}
+</div>
+<div *ngIf="mensagemErro" class="mensagem-feedback erro animate">
+  <i class="fas fa-exclamation-circle"></i> {{ mensagemErro }}
+</div>
+
+<!-- Spinner de carregamento -->
+<div *ngIf="loading" class="spinner-overlay">
+  <div class="spinner"></div>
+</div>
+
+<div class="main-content">
+  <!-- Card Lista -->
+  <div class="card-lista" *ngIf="showList">
+    <div class="busca-container">
+      <div class="busca-input-wrapper">
+        <i class="fas fa-search"></i>
+        <input
+          class="campo-busca"
+          type="text"
+          placeholder="Buscar por nome, CPF ou endereço..."
+          [(ngModel)]="searchTerm"
+          (input)="applyFilter()"
+        />
+      </div>
+    </div>
+    <table class="tabela-consumidores">
+      <thead>
+        <tr>
+          <th><i class="fas fa-hashtag"></i> ID</th>
+          <th><i class="fas fa-user"></i> Nome</th>
+          <th><i class="fas fa-id-card"></i> CPF</th>
+          <th><i class="fas fa-map-marker-alt"></i> Endereço</th>
+          <th><i class="fas fa-cogs"></i> Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let consumer of filteredConsumers">
+          <td data-label="ID">{{ consumer.id }}</td>
+          <td data-label="Nome">{{ consumer.nome }}</td>
+          <td data-label="CPF">{{ consumer.cpf }}</td>
+          <td data-label="Endereço">{{ consumer.endereco }}</td>
+          <td class="acoes-tabela" data-label="Ações">
+            <button (click)="editConsumer(consumer)" class="btn btn-primary btn-sm" title="Editar">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button (click)="deleteConsumer(consumer.id)" class="btn btn-danger btn-sm" title="Deletar">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- Paginação -->
+    <div class="pagination-bar" *ngIf="totalPages > 0">
+      <div class="pagination-info-left">
+        Página {{ currentPage + 1 }} de {{ totalPages }} ({{ totalElements }} consumidores)
+      </div>
+      <div class="pagination-row">
+        <button class="btn-pag" (click)="paginaAnterior()" [disabled]="currentPage === 0">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <ng-container *ngFor="let page of [].constructor(totalPages); let i = index">
+          <button
+            class="pagina-numero"
+            [class.ativa]="i === currentPage"
+            (click)="irParaPagina(i)"
+            [disabled]="i === currentPage">
+            {{ i + 1 }}
+          </button>
+        </ng-container>
+        <button class="btn-pag" (click)="proximaPagina()" [disabled]="currentPage >= totalPages - 1">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+      <div class="pagination-info-right select-page-size">
+        <label for="pageSizeSelect">Exibir</label>
+        <select id="pageSizeSelect" [(ngModel)]="pageSize" (change)="onPageSizeChange($event)">
+          <option *ngFor="let size of [10, 20, 30, 40]" [value]="size">{{size}}</option>
+        </select>
+        <span>por página</span>
+      </div>
+    </div>
+  </div>
+  <!-- Card Formulário -->
+  <div class="card-form" *ngIf="showAddForm">
+    <h3 class="titulo-form">
+      <i class="fas fa-user-edit"></i>
+      {{ editingConsumer ? 'Editar Consumidor' : 'Adicionar Consumidor' }}
+    </h3>
+    <form [formGroup]="consumerForm" (ngSubmit)="submitAddForm()" class="form-adicionar">
+      <div class="form-group">
+        <label for="nome">Nome</label>
+        <input id="nome" type="text" formControlName="nome" required [class.invalido]="consumerForm.get('nome')?.invalid && consumerForm.get('nome')?.touched" />
+        <div class="erro-campo" *ngIf="consumerForm.get('nome')?.invalid && consumerForm.get('nome')?.touched">
+          Nome é obrigatório.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="cpf">CPF</label>
+        <input id="cpf" type="text" formControlName="cpf" required maxlength="11" [class.invalido]="consumerForm.get('cpf')?.invalid && consumerForm.get('cpf')?.touched" />
+        <div class="erro-campo" *ngIf="consumerForm.get('cpf')?.invalid && consumerForm.get('cpf')?.touched">
+          CPF deve conter 11 dígitos numéricos.
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="endereco">Endereço</label>
+        <input id="endereco" type="text" formControlName="endereco" required [class.invalido]="consumerForm.get('endereco')?.invalid && consumerForm.get('endereco')?.touched" />
+        <div class="erro-campo" *ngIf="consumerForm.get('endereco')?.invalid && consumerForm.get('endereco')?.touched">
+          Endereço é obrigatório.
+        </div>
+      </div>
+      <div class="botoes-form">
+        <button type="submit" class="botao-salvar" [disabled]="consumerForm.invalid || loading">
+          <span *ngIf="!loading"><i class="fas fa-save"></i> {{ editingConsumer ? 'Salvar' : 'Adicionar' }}</span>
+          <span *ngIf="loading" class="spinner-mini"></span>
+        </button>
+        <button type="button" class="botao-cancelar" (click)="toggleList()" [disabled]="loading">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

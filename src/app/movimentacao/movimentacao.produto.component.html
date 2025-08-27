@@ -1,0 +1,251 @@
+<div class="container">
+  <header class="page-header">
+    <h1><i class="fas fa-exchange-alt"></i> Movimentações de Produtos</h1>
+  </header>
+
+  <div class="content-wrapper">
+    <!-- Painel de Filtros -->
+    <aside class="filters-panel">
+      <div class="panel-header">
+        <h3><i class="fas fa-filter"></i> Filtros</h3>
+        <small class="filter-info">
+          <i class="fas fa-info-circle"></i>
+          Os filtros podem ser combinados. Ex: "Saídas" + "Junho" = Saídas em junho
+        </small>
+      </div>
+
+      <div class="filter-sections">
+        <!-- Seção de Tipo -->
+        <div class="filter-section">
+          <h4>Tipo de Movimentação</h4>
+          <div class="filter-content">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Tipo de Movimentação</mat-label>
+              <mat-select [(ngModel)]="tipoMovimentacao">
+                <mat-option *ngFor="let tipo of tiposMovimentacao" [value]="tipo">
+                  {{ tipo === 'ENTRADA' ? 'Entrada' : 'Saída' }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <button mat-raised-button color="primary" class="filter-btn" (click)="aplicarFiltroTipo()">
+              <i class="fas fa-search"></i>
+              Filtrar por Tipo
+            </button>
+          </div>
+        </div>
+
+        <!-- Seção de Datas -->
+        <div class="filter-section">
+          <h4>Filtros por Data</h4>
+          <div class="filter-content">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Data Específica</mat-label>
+              <input matInput 
+                     [matDatepicker]="dataPicker" 
+                     [(ngModel)]="data" 
+                     placeholder="Selecione a data"
+                     aria-label="Data específica">
+              <mat-datepicker-toggle matSuffix [for]="dataPicker"></mat-datepicker-toggle>
+              <mat-datepicker #dataPicker></mat-datepicker>
+            </mat-form-field>
+            
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Período - Início</mat-label>
+              <input matInput 
+                     [matDatepicker]="inicioPicker" 
+                     [(ngModel)]="inicio" 
+                     placeholder="Selecione a data inicial"
+                     aria-label="Data inicial do período">
+              <mat-datepicker-toggle matSuffix [for]="inicioPicker"></mat-datepicker-toggle>
+              <mat-datepicker #inicioPicker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Período - Fim</mat-label>
+              <input matInput 
+                     [matDatepicker]="fimPicker" 
+                     [(ngModel)]="fim" 
+                     placeholder="Selecione a data final"
+                     aria-label="Data final do período">
+              <mat-datepicker-toggle matSuffix [for]="fimPicker"></mat-datepicker-toggle>
+              <mat-datepicker #fimPicker></mat-datepicker>
+            </mat-form-field>
+
+            <div class="period-inputs">
+              <mat-form-field appearance="fill">
+                <mat-label>Ano</mat-label>
+                <input matInput 
+                       type="number" 
+                       [(ngModel)]="ano" 
+                       min="2000" 
+                       max="2099"
+                       placeholder="Digite o ano"
+                       aria-label="Ano">
+              </mat-form-field>
+              <mat-form-field appearance="fill">
+                <mat-label>Mês</mat-label>
+                <mat-select [(ngModel)]="mes">
+                  <mat-option [value]="1">Janeiro</mat-option>
+                  <mat-option [value]="2">Fevereiro</mat-option>
+                  <mat-option [value]="3">Março</mat-option>
+                  <mat-option [value]="4">Abril</mat-option>
+                  <mat-option [value]="5">Maio</mat-option>
+                  <mat-option [value]="6">Junho</mat-option>
+                  <mat-option [value]="7">Julho</mat-option>
+                  <mat-option [value]="8">Agosto</mat-option>
+                  <mat-option [value]="9">Setembro</mat-option>
+                  <mat-option [value]="10">Outubro</mat-option>
+                  <mat-option [value]="11">Novembro</mat-option>
+                  <mat-option [value]="12">Dezembro</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <button mat-raised-button color="primary" class="filter-btn" (click)="aplicarFiltroData()">
+              <i class="fas fa-calendar-check"></i>
+              Filtrar por Data
+            </button>
+          </div>
+        </div>
+
+        <!-- Seção de Produto -->
+        <div class="filter-section">
+          <h4>Filtros do Produto</h4>
+          <div class="filter-content">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Nome do Produto</mat-label>
+              <input matInput [(ngModel)]="nomeProduto" placeholder="Digite o nome do produto">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Categoria</mat-label>
+              <input matInput [(ngModel)]="categoriaProduto" placeholder="Digite a categoria">
+            </mat-form-field>
+
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>ID do Produto</mat-label>
+              <input matInput type="number" [(ngModel)]="produtoId" placeholder="Digite o ID">
+            </mat-form-field>
+            <button mat-raised-button color="primary" class="filter-btn" (click)="aplicarFiltroProduto()">
+              <i class="fas fa-search"></i>
+              Filtrar por Produto
+            </button>
+          </div>
+        </div>
+
+        <!-- Seção de Consumidor -->
+        <div class="filter-section">
+          <h4>Filtro por Consumidor</h4>
+          <div class="filter-content">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Nome do Consumidor</mat-label>
+              <input matInput [(ngModel)]="nomeConsumidor" placeholder="Digite o nome do consumidor">
+            </mat-form-field>
+            <button mat-raised-button color="primary" class="filter-btn" (click)="aplicarFiltroConsumidor()">
+              <i class="fas fa-user"></i>
+              Filtrar por Consumidor
+            </button>
+          </div>
+        </div>
+        
+        <!-- Botões de ação -->
+        <div class="filter-actions">
+          <button mat-raised-button color="accent" (click)="limparFiltros()">
+            <i class="fas fa-eraser"></i>
+            Limpar Filtros
+          </button>
+          <button mat-raised-button 
+                  [color]="temFiltrosAtivos() ? 'warn' : 'primary'" 
+                  (click)="aplicarTodosFiltros()">
+            <i class="fas fa-search"></i>
+            {{ temFiltrosAtivos() ? 'Aplicar Filtros Ativos' : 'Aplicar Todos os Filtros' }}
+          </button>
+          <button mat-raised-button color="primary" (click)="registrarMovimentacao()">
+            <i class="fas fa-plus-circle"></i>
+            Nova Movimentação
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Área principal com a tabela de resultados -->
+    <main class="results-panel">
+      <!-- Loading state -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner">
+          <i class="fas fa-spinner fa-spin"></i>
+        </div>
+        <p>Carregando movimentações...</p>
+      </div>
+
+      <!-- Empty state -->
+      <div *ngIf="!loading && movimentacoes.length === 0" class="empty-state">
+        <i class="fas fa-box-open"></i>
+        <p>Nenhuma movimentação encontrada com os filtros selecionados.</p>
+        <small>Tente ajustar os filtros para encontrar mais resultados</small>
+      </div>
+
+      <!-- Results table -->
+      <div *ngIf="!loading && movimentacoes.length > 0" class="table-container">
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <colgroup>
+                <col style="width: 60px">
+                <col style="width: 25%">
+                <col style="width: 12%">
+                <col style="width: 12%">
+                <col style="width: 18%">
+                <col style="width: 33%">
+              </colgroup>
+              <tr>
+                <th><i class="fas fa-id-badge"></i> ID</th>
+                <th><i class="fas fa-cube"></i> Produto</th>
+                <th><i class="fas fa-exchange-alt"></i> Tipo</th>
+                <th><i class="fas fa-sort-numeric-up"></i> Quantidade</th>
+                <th><i class="fas fa-calendar-alt"></i> Data</th>
+                <th><i class="fas fa-user-tie"></i> Consumidor</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let movimentacao of movimentacoes; let i = index" [ngClass]="{'entrada': movimentacao.tipo === TIPO_MOVIMENTACAO_ENTRADA, 'saida': movimentacao.tipo === TIPO_MOVIMENTACAO_SAIDA}">
+                <td>{{ movimentacao.id }}</td>
+                <td>{{ movimentacao.nomeProduto }}</td>
+                <td>
+                  <span class="badge" [ngClass]="{'badge-entrada': movimentacao.tipo === TIPO_MOVIMENTACAO_ENTRADA, 'badge-saida': movimentacao.tipo === TIPO_MOVIMENTACAO_SAIDA}">
+                    <i class="fas" [ngClass]="{'fa-arrow-down': movimentacao.tipo === TIPO_MOVIMENTACAO_ENTRADA, 'fa-arrow-up': movimentacao.tipo === TIPO_MOVIMENTACAO_SAIDA}"></i>
+                    {{ movimentacao.tipo === TIPO_MOVIMENTACAO_ENTRADA ? 'Entrada' : 'Saída' }}
+                  </span>
+                </td>
+                <td>{{ movimentacao.quantidade }}</td>
+                <td>{{ movimentacao.dataHora | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                  <span *ngIf="movimentacao.nomeConsumidor; else semConsumidor" class="consumer-info">
+                    <i class="fas fa-user-tie"></i>
+                    {{ movimentacao.nomeConsumidor }}
+                  </span>
+                  <ng-template #semConsumidor>
+                    <span class="no-consumer">
+                      <i class="fas fa-user-slash"></i>
+                      N/A
+                    </span>
+                  </ng-template>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginação -->
+        <mat-paginator 
+          [length]="totalItems"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [pageIndex]="pageIndex"
+          (page)="onPageChange($event)"
+          showFirstLastButtons
+          class="paginator">
+        </mat-paginator>
+      </div>
+    </main>
+  </div>
+</div>

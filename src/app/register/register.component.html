@@ -1,0 +1,254 @@
+<div class="register-container">
+  <!-- Background animated elements -->
+  <div class="bg-animation">
+    <div class="floating-shape shape-1"></div>
+    <div class="floating-shape shape-2"></div>
+    <div class="floating-shape shape-3"></div>
+  </div>
+
+  <div class="register-wrapper" [@slideInUp]>
+    <!-- Progress indicator -->
+    <div class="progress-container">
+      <div class="progress-bar">
+        <div class="progress-fill" [style.width.%]="getFormProgress()"></div>
+      </div>
+      <span class="progress-text">{{ getFormProgress() }}% completo</span>
+    </div>
+
+    <header class="register-header">
+      <div class="logo-container">
+        <div class="logo-icon">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+        <h2>Criar Conta</h2>
+      </div>
+      <p class="register-subtitle">Junte-se ao melhor sistema de gerenciamento de estoque</p>
+    </header>
+
+    <!-- Mensagens de Sucesso e Erro -->
+    <div *ngIf="successMessage" class="alert alert-success" [@fadeInOut]>
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ successMessage }}</span>
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger" [@fadeInOut]>
+      <mat-icon>error</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <!-- Formulário de Registro -->
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+      <div class="form-grid">
+        <!-- Campo Username -->
+        <div class="form-group" [@slideInLeft]>
+          <label for="username">
+            <mat-icon>person</mat-icon>
+            Nome de Usuário
+            <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input 
+              id="username" 
+              formControlName="username" 
+              type="text" 
+              class="form-control" 
+              [class.valid]="registerForm.get('username')?.valid && registerForm.get('username')?.touched"
+              [class.invalid]="registerForm.get('username')?.invalid && registerForm.get('username')?.touched"
+              placeholder="Digite seu nome de usuário"
+              (focus)="onFieldFocus('username')"
+              (blur)="onFieldBlur('username')"
+            />
+            <div class="input-icon">
+              <mat-icon *ngIf="registerForm.get('username')?.valid && registerForm.get('username')?.touched" class="success-icon">check_circle</mat-icon>
+              <mat-icon *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="error-icon">error</mat-icon>
+            </div>
+          </div>
+          <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="error" [@fadeInOut]>
+            <mat-icon>warning</mat-icon>
+            <span>Nome de usuário é obrigatório</span>
+          </div>
+          <div class="field-hint">Escolha um nome único para sua conta</div>
+        </div>
+
+        <!-- Campo Senha -->
+        <div class="form-group" [@slideInRight]>
+          <label for="senha">
+            <mat-icon>lock</mat-icon>
+            Senha
+            <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input 
+              id="senha" 
+              formControlName="senha" 
+              [type]="showPassword ? 'text' : 'password'"
+              class="form-control password-input" 
+              [class.valid]="registerForm.get('senha')?.valid && registerForm.get('senha')?.touched"
+              [class.invalid]="registerForm.get('senha')?.invalid && registerForm.get('senha')?.touched"
+              placeholder="Digite sua senha"
+              (input)="onPasswordChange()"
+              (focus)="onFieldFocus('senha')"
+              (blur)="onFieldBlur('senha')"
+            />
+            <button 
+              type="button" 
+              class="password-toggle-btn"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword ? 'Ocultar senha' : 'Mostrar senha'"
+            >
+              <mat-icon>{{ showPassword ? 'visibility_off' : 'visibility' }}</mat-icon>
+            </button>
+          </div>
+          
+          <!-- Password strength indicator -->
+          <div class="password-strength" *ngIf="registerForm.get('senha')?.value">
+            <div class="strength-bar">
+              <div class="strength-fill" [ngClass]="passwordStrength.class" [style.width.%]="passwordStrength.percentage"></div>
+            </div>
+            <span class="strength-text" [ngClass]="passwordStrength.class">{{ passwordStrength.text }}</span>
+          </div>
+          
+          <div *ngIf="registerForm.get('senha')?.hasError('required') && registerForm.get('senha')?.touched" class="error" [@fadeInOut]>
+            <mat-icon>warning</mat-icon>
+            <span>Senha é obrigatória</span>
+          </div>
+          <div *ngIf="registerForm.get('senha')?.hasError('minlength') && registerForm.get('senha')?.touched" class="error" [@fadeInOut]>
+            <mat-icon>warning</mat-icon>
+            <span>A senha deve ter pelo menos 6 caracteres</span>
+          </div>
+          <div class="field-hint">Use pelo menos 6 caracteres com letras e números</div>
+        </div>
+      </div>
+      
+      <div class="form-grid">
+
+        <!-- Campo Email -->
+        <div class="form-group" [@slideInLeft]>
+          <label for="email">
+            <mat-icon>email</mat-icon>
+            Email
+            <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input 
+              id="email" 
+              formControlName="email" 
+              type="email" 
+              class="form-control" 
+              [class.valid]="registerForm.get('email')?.valid && registerForm.get('email')?.touched"
+              [class.invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+              placeholder="seu@email.com"
+              (focus)="onFieldFocus('email')"
+              (blur)="onFieldBlur('email')"
+            />
+            <div class="input-icon">
+              <mat-icon *ngIf="registerForm.get('email')?.valid && registerForm.get('email')?.touched" class="success-icon">check_circle</mat-icon>
+              <mat-icon *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="error-icon">error</mat-icon>
+            </div>
+          </div>
+          <div *ngIf="registerForm.get('email')?.hasError('required') && registerForm.get('email')?.touched" class="error" [@fadeInOut]>
+            <mat-icon>warning</mat-icon>
+            <span>Email é obrigatório</span>
+          </div>
+          <div *ngIf="registerForm.get('email')?.hasError('email') && registerForm.get('email')?.touched" class="error" [@fadeInOut]>
+            <mat-icon>warning</mat-icon>
+            <span>Formato de email inválido</span>
+          </div>
+          <div class="field-hint">Usaremos este email para comunicações importantes</div>
+        </div>
+
+        <!-- Campo ID da Organização -->
+        <div class="form-group" [@slideInRight]>
+          <label for="orgId">
+            <mat-icon>business</mat-icon>
+            ID da Organização
+            <span class="required">*</span>
+          </label>
+          <div class="input-container">
+            <input 
+              id="orgId" 
+              formControlName="orgId" 
+              type="text" 
+              class="form-control" 
+              [class.valid]="registerForm.get('orgId')?.valid && registerForm.get('orgId')?.touched"
+              [class.invalid]="registerForm.get('orgId')?.invalid && registerForm.get('orgId')?.touched"
+              placeholder="Digite o ID da organização"
+              (focus)="onFieldFocus('orgId')"
+              (blur)="onFieldBlur('orgId')"
+            />
+            <div class="input-icon">
+              <mat-icon *ngIf="registerForm.get('orgId')?.valid && registerForm.get('orgId')?.touched" class="success-icon">check_circle</mat-icon>
+              <mat-icon *ngIf="registerForm.get('orgId')?.invalid && registerForm.get('orgId')?.touched" class="error-icon">error</mat-icon>
+            </div>
+          </div>
+          <div *ngIf="registerForm.get('orgId')?.invalid && registerForm.get('orgId')?.touched" class="error" [@fadeInOut]>
+            <mat-icon>warning</mat-icon>
+            <span>ID da organização é obrigatório</span>
+          </div>
+          <div class="field-hint">Solicite este ID ao administrador da sua empresa</div>
+        </div>
+      </div>
+
+      <!-- Campo Roles -->
+      <div class="form-group full-width" [@slideInUp]>
+        <label>
+          <mat-icon>admin_panel_settings</mat-icon>
+          Permissões
+          <span class="required">*</span>
+        </label>
+        <div class="roles-container">
+          <div class="roles-grid">
+            <div 
+              *ngFor="let role of roles; trackBy: trackByRole" 
+              class="role-chip"
+              [class.selected]="isRoleSelected(role.nome)"
+              (click)="toggleRole(role.nome)"
+              [@scaleIn]
+            >
+              <mat-icon>{{ getRoleIcon(role.nome) }}</mat-icon>
+              <span>{{ role.nome }}</span>
+              <div class="role-check" *ngIf="isRoleSelected(role.nome)">
+                <mat-icon>check</mat-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="registerForm.get('roles')?.invalid && registerForm.get('roles')?.touched" class="error" [@fadeInOut]>
+          <mat-icon>warning</mat-icon>
+          <span>Selecione pelo menos uma permissão</span>
+        </div>
+        <div class="field-hint">Escolha as permissões adequadas para sua função</div>
+      </div>
+
+      <!-- Botões -->
+      <div class="form-buttons" [@slideInUp]>
+        <button 
+          type="submit" 
+          [disabled]="registerForm.invalid || isSubmitting" 
+          class="btn btn-primary"
+          [class.loading]="isSubmitting"
+        >
+          <div class="btn-content">
+            <mat-icon *ngIf="!isSubmitting">person_add</mat-icon>
+            <div *ngIf="isSubmitting" class="loading-spinner"></div>
+            <span>{{ isSubmitting ? 'Criando conta...' : 'Criar Conta' }}</span>
+          </div>
+        </button>
+        <button 
+          type="button" 
+          (click)="cancel()" 
+          class="btn btn-secondary"
+          [disabled]="isSubmitting"
+        >
+          <mat-icon>cancel</mat-icon>
+          <span>Cancelar</span>
+        </button>
+      </div>
+      
+      <!-- Login link -->
+      <div class="login-link">
+        <span>Já tem uma conta?</span>
+        <a routerLink="/login" class="link">Fazer login</a>
+      </div>
+    </form>
+  </div>
+</div>

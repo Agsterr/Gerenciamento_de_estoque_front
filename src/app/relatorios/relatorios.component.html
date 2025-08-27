@@ -1,0 +1,220 @@
+<div class="relatorios-container">
+  <div class="header">
+    <h1><i class="fas fa-chart-bar"></i> Relatórios</h1>
+    <p class="description">Gere relatórios em PDF e Excel dos principais dados do sistema.</p>
+  </div>
+
+  <div class="reports-grid">
+    <!-- Produtos - Estoque Baixo -->
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <i class="fas fa-exclamation-triangle"></i>
+          Produtos - Estoque Baixo
+        </mat-card-title>
+        <mat-card-subtitle>Relatório de produtos com estoque abaixo do mínimo</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p>Gera relatório de todos os produtos que estão com estoque baixo na organização.</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="baixarEstoqueBaixoPdf()" [disabled]="loading">
+          <mat-icon>picture_as_pdf</mat-icon>
+          PDF
+        </button>
+        <button mat-raised-button color="accent" (click)="baixarEstoqueBaixoXlsx()" [disabled]="loading">
+          <mat-icon>grid_on</mat-icon>
+          Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Entregas por Período -->
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <i class="fas fa-calendar-alt"></i>
+          Entregas por Período
+        </mat-card-title>
+        <mat-card-subtitle>Relatório de entregas em um intervalo de datas</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="date-inputs">
+          <mat-form-field appearance="outline">
+            <mat-label>Data de Início</mat-label>
+            <input matInput [matDatepicker]="dpInicio" [(ngModel)]="inicio" required placeholder="DD/MM/AAAA">
+            <mat-datepicker-toggle matSuffix [for]="dpInicio"></mat-datepicker-toggle>
+            <mat-datepicker #dpInicio></mat-datepicker>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Data de Fim</mat-label>
+            <input matInput [matDatepicker]="dpFim" [(ngModel)]="fim" required placeholder="DD/MM/AAAA">
+            <mat-datepicker-toggle matSuffix [for]="dpFim"></mat-datepicker-toggle>
+            <mat-datepicker #dpFim></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="baixarEntregasPeriodoPdf()" [disabled]="loading || !inicio || !fim">
+          <mat-icon>picture_as_pdf</mat-icon>
+          PDF
+        </button>
+        <button mat-raised-button color="accent" (click)="baixarEntregasPeriodoXlsx()" [disabled]="loading || !inicio || !fim">
+          <mat-icon>grid_on</mat-icon>
+          Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Entregas do Dia -->
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <i class="fas fa-calendar-day"></i>
+          Entregas do Dia
+        </mat-card-title>
+        <mat-card-subtitle>Relatório de entregas de uma data específica</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="date-inputs">
+          <mat-form-field appearance="outline">
+            <mat-label>Data</mat-label>
+            <input matInput [matDatepicker]="dpDia" [(ngModel)]="dia" required placeholder="DD/MM/AAAA">
+            <mat-datepicker-toggle matSuffix [for]="dpDia"></mat-datepicker-toggle>
+            <mat-datepicker #dpDia></mat-datepicker>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="baixarEntregasDiaPdf()" [disabled]="loading || !dia">
+          <mat-icon>picture_as_pdf</mat-icon>
+          PDF
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Movimentações por Mês -->
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <i class="fas fa-exchange-alt"></i>
+          Movimentações por Mês
+        </mat-card-title>
+        <mat-card-subtitle>Relatório de movimentações de produtos por mês</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="month-inputs">
+          <mat-form-field appearance="outline">
+            <mat-label>Ano</mat-label>
+            <input matInput type="number" [(ngModel)]="ano" min="2000" max="2099">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Mês</mat-label>
+            <mat-select [(ngModel)]="mes">
+              <mat-option *ngFor="let mesItem of meses" [value]="mesItem.valor">
+                {{ mesItem.nome }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="baixarMovimentacoesMesPdf()" [disabled]="loading">
+          <mat-icon>picture_as_pdf</mat-icon>
+          PDF
+        </button>
+        <button mat-raised-button color="accent" (click)="baixarMovimentacoesMesXlsx()" [disabled]="loading">
+          <mat-icon>grid_on</mat-icon>
+          Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Entregas por Mês -->
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <i class="fas fa-calendar-week"></i>
+          Entregas por Mês
+        </mat-card-title>
+        <mat-card-subtitle>Relatório de entregas de um mês específico</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="month-inputs">
+          <mat-form-field appearance="outline">
+            <mat-label>Ano</mat-label>
+            <input matInput type="number" [(ngModel)]="ano" min="2000" max="2099">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Mês</mat-label>
+            <mat-select [(ngModel)]="mes">
+              <mat-option *ngFor="let mesItem of meses" [value]="mesItem.valor">
+                {{ mesItem.nome }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="baixarEntregasMesPdf()" [disabled]="loading">
+          <mat-icon>picture_as_pdf</mat-icon>
+          PDF
+        </button>
+        <button mat-raised-button color="accent" (click)="baixarEntregasMesXlsx()" [disabled]="loading">
+          <mat-icon>grid_on</mat-icon>
+          Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Entregas por Ano -->
+    <mat-card class="report-card">
+      <mat-card-header>
+        <mat-card-title>
+          <i class="fas fa-calendar"></i>
+          Entregas por Ano
+        </mat-card-title>
+        <mat-card-subtitle>Relatório anual de todas as entregas</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="month-inputs">
+          <mat-form-field appearance="outline">
+            <mat-label>Ano</mat-label>
+            <input matInput type="number" [(ngModel)]="ano" min="2000" max="2099">
+          </mat-form-field>
+        </div>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="baixarEntregasAnoPdf()" [disabled]="loading">
+          <mat-icon>picture_as_pdf</mat-icon>
+          PDF
+        </button>
+        <button mat-raised-button color="accent" (click)="baixarEntregasAnoXlsx()" [disabled]="loading">
+          <mat-icon>grid_on</mat-icon>
+          Excel
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- Botão para limpar filtros -->
+  <div class="actions-footer">
+    <button mat-stroked-button color="warn" (click)="limparFiltros()">
+      <mat-icon>clear</mat-icon>
+      Limpar Filtros
+    </button>
+  </div>
+
+  <!-- Status e Loading -->
+  <div class="status-container" *ngIf="loading || mensagem || erro">
+    <div class="status-card" [ngClass]="{'loading': loading, 'error': erro, 'success': mensagem}">
+      <mat-spinner *ngIf="loading" diameter="24"></mat-spinner>
+      <mat-icon *ngIf="!loading && erro" class="error-icon">error</mat-icon>
+      <mat-icon *ngIf="!loading && mensagem" class="success-icon">check_circle</mat-icon>
+      
+      <span *ngIf="loading" class="status-text">Gerando relatório...</span>
+      <span *ngIf="mensagem" class="status-text">{{ mensagem }}</span>
+      <span *ngIf="erro" class="status-text">{{ erro }}</span>
+    </div>
+  </div>
+</div>

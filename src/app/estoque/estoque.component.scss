@@ -1,0 +1,63 @@
+.estoque-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  nav {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1rem;
+  
+    &:hover {
+      color: #0056b3;
+      text-decoration: underline;
+    }
+  
+    &.active {
+      font-weight: bold;
+      color: #0056b3;
+    }
+  }
+  
+  /* Estilo responsivo */
+  @media (max-width: 768px) {
+    nav {
+      flex-direction: column;
+      gap: 10px;
+    }
+  
+    a {
+      font-size: 0.9rem;
+    }
+  
+    h2 {
+      font-size: 1.2rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    h2 {
+      font-size: 1rem;
+    }
+  
+    a {
+      font-size: 0.8rem;
+    }
+  }
+  

@@ -1,0 +1,57 @@
+<header class="main-navbar">
+  <div class="navbar-content">
+    <div class="navbar-left">
+      <a routerLink="/home" class="brand">
+        <mat-icon class="brand-icon">warehouse</mat-icon>
+        <span class="brand-title">Estoque</span>
+      </a>
+    </div>
+    <nav class="navbar-menu" [class.open]="menuAberto">
+      <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+        <mat-icon>home</mat-icon>
+        Home
+      </a>
+      <ng-container *ngIf="authService">
+        <ng-container *ngIf="!isLoggedIn">
+          <a routerLink="/login" routerLinkActive="active" class="nav-link">
+            <mat-icon>login</mat-icon>
+            Login
+          </a>
+        </ng-container>
+        <a routerLink="/register" routerLinkActive="active" class="nav-link">
+          <mat-icon>person_add</mat-icon>
+          Register
+        </a>
+        <ng-container *ngIf="isAdmin">
+          <a routerLink="/orgs" routerLinkActive="active" class="nav-link">
+            <mat-icon>business</mat-icon>
+            Organizações
+          </a>
+        </ng-container>
+        <ng-container *ngIf="isLoggedIn">
+          <a routerLink="/dashboard" routerLinkActive="active" class="nav-link dashboard-link">
+            <mat-icon>dashboard</mat-icon>
+            Dashboard
+          </a>
+          <button mat-button [matMenuTriggerFor]="menu" aria-label="Menu do usuário" class="user-button">
+            <span class="avatar">{{ userName.charAt(0) | uppercase }}</span>
+            <span class="user-name">{{ userName }}</span>
+            <mat-icon>arrow_drop_down</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              Logout
+            </button>
+          </mat-menu>
+        </ng-container>
+      </ng-container>
+    </nav>
+    <button class="menu-toggle" (click)="menuAberto = !menuAberto" aria-label="Alternar menu">
+      <mat-icon>{{ menuAberto ? 'close' : 'menu' }}</mat-icon>
+    </button>
+  </div>
+</header>
+<div class="router-container main-content">
+  <router-outlet></router-outlet>
+</div>

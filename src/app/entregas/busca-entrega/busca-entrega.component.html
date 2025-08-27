@@ -1,0 +1,128 @@
+<div class="busca-entrega" [class.loading]="isLoading">
+  <div class="header">
+    <h2><i class="fas fa-search"></i> Buscar Entregas</h2>
+    <p class="subtitle">Selecione um dos filtros abaixo para buscar entregas</p>
+  </div>
+
+  <div class="filtros-container">
+    <!-- Card para buscar por período -->
+    <div class="filtro-card">
+      <div class="card-header">
+        <i class="fas fa-calendar-alt"></i>
+        <h3>Buscar por Período</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+  <div class="form-group">
+            <label for="dataInicio">Data Início</label>
+    <input type="date" id="dataInicio" [(ngModel)]="dataInicio" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label for="dataFim">Data Fim</label>
+    <input type="date" id="dataFim" [(ngModel)]="dataFim" class="form-control" />
+          </div>
+        </div>
+        <button (click)="onSubmit()" class="btn btn-primary" [disabled]="!dataInicio || !dataFim || isLoading">
+          <i class="fas fa-search"></i> {{ isLoading ? 'Buscando...' : 'Buscar por Período' }}
+        </button>
+      </div>
+  </div>
+
+    <!-- Card para buscar por mês e ano -->
+    <div class="filtro-card">
+      <div class="card-header">
+        <i class="fas fa-calendar"></i>
+        <h3>Buscar por Mês e Ano</h3>
+      </div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="mes">Mês</label>
+            <select id="mes" [(ngModel)]="mes" class="form-control">
+              <option value="">Selecione o mês</option>
+              <option value="1">Janeiro</option>
+              <option value="2">Fevereiro</option>
+              <option value="3">Março</option>
+              <option value="4">Abril</option>
+              <option value="5">Maio</option>
+              <option value="6">Junho</option>
+              <option value="7">Julho</option>
+              <option value="8">Agosto</option>
+              <option value="9">Setembro</option>
+              <option value="10">Outubro</option>
+              <option value="11">Novembro</option>
+              <option value="12">Dezembro</option>
+            </select>
+          </div>
+  <div class="form-group">
+            <label for="ano">Ano</label>
+            <input type="number" id="ano" [(ngModel)]="ano" class="form-control" placeholder="2024" />
+          </div>
+        </div>
+        <button (click)="onSubmitMesAno()" class="btn btn-primary" [disabled]="!mes || !ano || isLoading">
+          <i class="fas fa-search"></i> {{ isLoading ? 'Buscando...' : 'Buscar por Mês e Ano' }}
+        </button>
+      </div>
+  </div>
+
+    <!-- Card para buscar por produto -->
+    <div class="filtro-card">
+      <div class="card-header">
+        <i class="fas fa-box"></i>
+        <h3>Buscar por Produto</h3>
+      </div>
+      <div class="card-body">
+  <div class="form-group">
+          <label for="produtoId">ID do Produto</label>
+          <input type="number" id="produtoId" [(ngModel)]="produtoId" class="form-control" placeholder="Digite o ID do produto" />
+        </div>
+        <button (click)="onBuscarPorProduto()" class="btn btn-primary" [disabled]="!produtoId || isLoading">
+          <i class="fas fa-search"></i> {{ isLoading ? 'Buscando...' : 'Buscar por Produto' }}
+        </button>
+      </div>
+  </div>
+
+    <!-- Card para buscar por consumidor -->
+    <div class="filtro-card">
+      <div class="card-header">
+        <i class="fas fa-user"></i>
+        <h3>Buscar por Consumidor</h3>
+      </div>
+      <div class="card-body">
+  <div class="form-group">
+          <label for="consumidorId">ID do Consumidor</label>
+          <input type="number" id="consumidorId" [(ngModel)]="consumidorId" class="form-control" placeholder="Digite o ID do consumidor" />
+        </div>
+        <button (click)="onBuscarPorConsumidor()" class="btn btn-primary" [disabled]="!consumidorId || isLoading">
+          <i class="fas fa-search"></i> {{ isLoading ? 'Buscando...' : 'Buscar por Consumidor' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Resultados e ações -->
+  <div class="resultados-section">
+    <!-- Mensagem de erro -->
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Mensagem de "Nenhuma entrega encontrada" -->
+    <div *ngIf="isSearched && entregas.length === 0 && !errorMessage" class="alert alert-warning">
+      <i class="fas fa-exclamation-triangle"></i>
+      <span>Nenhuma entrega encontrada com os filtros aplicados.</span>
+    </div>
+
+    <!-- Contador de resultados -->
+    <div *ngIf="isSearched && entregas.length > 0" class="resultados-info">
+      <i class="fas fa-list"></i>
+      <span>{{ entregas.length }} entrega(s) encontrada(s)</span>
+  </div>
+
+  <!-- Botão para limpar os filtros -->
+    <button type="button" class="btn btn-secondary" (click)="limparFiltros()" [disabled]="isLoading">
+      <i class="fas fa-times"></i> Limpar Filtros
+    </button>
+  </div>
+</div>
