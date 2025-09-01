@@ -8,11 +8,12 @@ import { PageEntregaResponse } from '../models/src/app/models/entrega/PageEntreg
 import { EntregaRequest } from '../models/src/app/models/entrega/entrega-request.model';
 import { EntregaComAvisoResponse } from '../models/src/app/models/entrega/entrega-com-aviso-response.model';
 import { environment } from '../../environments/environment';
+
 @Injectable({
   providedIn: 'root'
 })
 export class EntregasService {
-  private apiUrl =  `${environment.apiUrl}/entregas';
+  private apiUrl = `${environment.apiUrl}/entregas`;
 
   constructor(private http: HttpClient) {}
 
