@@ -208,17 +208,17 @@
             </thead>
             <tbody>
               <tr *ngFor="let movimentacao of movimentacoes; let i = index" [ngClass]="{'entrada': movimentacao.tipo === TIPO_MOVIMENTACAO_ENTRADA, 'saida': movimentacao.tipo === TIPO_MOVIMENTACAO_SAIDA}">
-                <td>{{ movimentacao.id }}</td>
-                <td>{{ movimentacao.nomeProduto }}</td>
-                <td>
+                <td data-label="ID">{{ movimentacao.id }}</td>
+                <td data-label="Produto">{{ movimentacao.nomeProduto }}</td>
+                <td data-label="Tipo">
                   <span class="badge" [ngClass]="{'badge-entrada': movimentacao.tipo === TIPO_MOVIMENTACAO_ENTRADA, 'badge-saida': movimentacao.tipo === TIPO_MOVIMENTACAO_SAIDA}">
                     <i class="fas" [ngClass]="{'fa-arrow-down': movimentacao.tipo === TIPO_MOVIMENTACAO_ENTRADA, 'fa-arrow-up': movimentacao.tipo === TIPO_MOVIMENTACAO_SAIDA}"></i>
                     {{ movimentacao.tipo === TIPO_MOVIMENTACAO_ENTRADA ? 'Entrada' : 'Saída' }}
                   </span>
                 </td>
-                <td>{{ movimentacao.quantidade }}</td>
-                <td>{{ movimentacao.dataHora | date:'dd/MM/yyyy HH:mm' }}</td>
-                <td>
+                <td data-label="Quantidade">{{ movimentacao.quantidade }}</td>
+                <td data-label="Data">{{ movimentacao.dataHora | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td data-label="Consumidor">
                   <span *ngIf="movimentacao.nomeConsumidor; else semConsumidor" class="consumer-info">
                     <i class="fas fa-user-tie"></i>
                     {{ movimentacao.nomeConsumidor }}

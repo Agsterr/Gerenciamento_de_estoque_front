@@ -406,25 +406,94 @@ mat-paginator {
   }
 }
 
+/* Responsividade para dispositivos móveis */
 @media (max-width: 768px) {
-  .container {
-    padding: 16px;
+  .table-wrapper {
+    overflow: visible;
   }
-  
-  .page-header h1 {
-    font-size: 1.5rem;
+
+  table.table {
+    border: 0;
+    width: 100%;
   }
-  
-  .filters-panel, .results-panel {
-    padding: 16px;
+
+  table.table thead {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    width: 1px;
   }
-  
-  .table {
-    font-size: 0.9rem;
-    
-    th, td {
-      padding: 8px;
-    }
+
+  table.table tr {
+    display: block;
+    background: #fff;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  table.table td {
+    display: grid;
+    grid-template-columns: 40% 1fr;
+    gap: 8px;
+    text-align: left !important;
+    padding: 10px 12px;
+    border: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  table.table td:last-child {
+    border-bottom: 0;
+  }
+
+  table.table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #555;
+    text-transform: none;
+  }
+
+  /* Badges e ícones */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .badge-entrada {
+    background: #e6f7ee;
+    color: #0f8a4b;
+    border: 1px solid #bfe9d1;
+  }
+
+  .badge-saida {
+    background: #fdecec;
+    color: #d64545;
+    border: 1px solid #f6c3c3;
+  }
+
+  .consumer-info, .no-consumer {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+/* Ajustes para telas muito pequenas */
+@media (max-width: 400px) {
+  table.table td {
+    grid-template-columns: 46% 1fr;
   }
 }
 
