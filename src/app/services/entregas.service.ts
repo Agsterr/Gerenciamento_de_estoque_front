@@ -7,12 +7,12 @@ import { EntregaResponse } from '../models/src/app/models/entrega/entrega-respon
 import { PageEntregaResponse } from '../models/src/app/models/entrega/PageEntregaResponse.model';
 import { EntregaRequest } from '../models/src/app/models/entrega/entrega-request.model';
 import { EntregaComAvisoResponse } from '../models/src/app/models/entrega/entrega-com-aviso-response.model';
-
+import { environment } from '../../environments/environment';
 @Injectable({
   providedIn: 'root'
 })
 export class EntregasService {
-  private apiUrl = 'http://localhost:8081/entregas';
+  private apiUrl =  `${environment.apiUrl}/entregas';
 
   constructor(private http: HttpClient) {}
 
