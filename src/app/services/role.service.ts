@@ -4,12 +4,13 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service'; // Importa o AuthService
 import { catchError } from 'rxjs/operators'; // Para capturar erros
 import { throwError } from 'rxjs'; // Para criar o erro
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RoleService {
-  private apiUrl = 'http://localhost:8081/roles'; // URL da API
+  private apiUrl = `${environment.apiUrl}/roles`; // URL da API
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
