@@ -408,6 +408,21 @@ mat-paginator {
 
 /* Responsividade para dispositivos móveis */
 @media (max-width: 768px) {
+  /* Permitir que o painel de resultados role junto com a página */
+  .results-panel {
+    overflow: visible;
+  }
+
+  /* Remover limites de altura que impedem a rolagem */
+  .table-container {
+    max-height: none;
+  }
+
+  .table-wrapper {
+    max-height: none;
+    overflow: visible; /* deixar a página controlar a rolagem */
+  }
+
   .table-wrapper {
     overflow: visible;
   }
