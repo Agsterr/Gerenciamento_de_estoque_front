@@ -159,7 +159,7 @@ p, span, div, td, th {
   min-height: 400px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Container da tabela */
@@ -421,8 +421,12 @@ mat-paginator {
   .table-wrapper {
     max-height: none;
     overflow: visible; /* deixar a página controlar a rolagem */
+    -webkit-overflow-scrolling: touch; /* rolagem suave no iOS */
   }
 
+  table.table td {
+    overflow: visible; /* não cortar conteúdo das células em layout de cards */
+  }
   .table-wrapper {
     overflow: visible;
   }

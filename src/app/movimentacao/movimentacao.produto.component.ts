@@ -97,7 +97,7 @@ export class MovimentacaoProdutoComponent implements OnInit {
           const responseFiltrada = {
             ...response,
             content: movimentacoesFiltradas,
-            totalElements: movimentacoesFiltradas.length
+            totalElements: response.totalElements
           };
           this.atualizarDadosPaginados(responseFiltrada);
         },
@@ -250,7 +250,7 @@ export class MovimentacaoProdutoComponent implements OnInit {
         const responseFiltrada = {
           ...response,
           content: movimentacoesFiltradas,
-          totalElements: movimentacoesFiltradas.length
+          totalElements: response.totalElements
         };
         this.atualizarDadosPaginados(responseFiltrada);
       },
@@ -310,7 +310,7 @@ export class MovimentacaoProdutoComponent implements OnInit {
         const responseFiltrada = {
           ...response,
           content: movimentacoesFiltradas,
-          totalElements: movimentacoesFiltradas.length
+          totalElements: response.totalElements
         };
         this.atualizarDadosPaginados(responseFiltrada);
       },
@@ -371,7 +371,7 @@ export class MovimentacaoProdutoComponent implements OnInit {
         const responseFiltrada = {
           ...response,
           content: movimentacoesFiltradas,
-          totalElements: movimentacoesFiltradas.length
+          totalElements: response.totalElements
         };
         this.atualizarDadosPaginados(responseFiltrada);
       },
@@ -416,7 +416,7 @@ export class MovimentacaoProdutoComponent implements OnInit {
         const responseFiltrada = {
           ...response,
           content: movimentacoesFiltradas,
-          totalElements: movimentacoesFiltradas.length
+          totalElements: response.totalElements
         };
         this.atualizarDadosPaginados(responseFiltrada);
       },
@@ -443,7 +443,7 @@ export class MovimentacaoProdutoComponent implements OnInit {
           const responseFiltrada = {
             ...response,
             content: movimentacoesFiltradas,
-            totalElements: movimentacoesFiltradas.length
+            totalElements: response.totalElements
           };
           this.atualizarDadosPaginados(responseFiltrada);
         },
