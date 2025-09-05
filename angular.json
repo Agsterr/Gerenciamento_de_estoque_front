@@ -28,6 +28,17 @@
                 "glob": "**/*",
                 "input": "public",
                 "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "public/icons",
+                "output": "/assets/icons/"
+              },
+              "src/manifest.webmanifest",
+              {
+                "glob": "custom-sw.js",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [
@@ -51,7 +62,8 @@
                   "maximumError": "32kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "serviceWorker": "ngsw-config.json"
             },
             "development": {
               "optimization": false,

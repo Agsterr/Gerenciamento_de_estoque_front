@@ -12,27 +12,30 @@ import { RelatoriosComponent } from './relatorios/relatorios.component';
 import { AdminGuard } from './guards/admin.guard';
 import { AuthGuard } from './guards/Auth.Guard';
 import { OrgComponent } from './org/org.component';
+import { OfflineComponent } from './offline.component';
+import { NetworkGuard } from './guards/network.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: 'home', component: HomeComponent },
-  { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent, canActivate: [AdminGuard] },
-  { path: 'orgs', component: OrgComponent, canActivate: [AdminGuard] },
+  { path: 'home', component: HomeComponent, canActivate: [NetworkGuard] },
+  { path: 'login', component: LoginComponent, canActivate: [NetworkGuard] },
+  { path: 'register', component: RegisterComponent, canActivate: [AdminGuard, NetworkGuard] },
+  { path: 'orgs', component: OrgComponent, canActivate: [AdminGuard, NetworkGuard] },
+  { path: 'offline', component: OfflineComponent },
 
   // Dashboard com rotas filhas
   {
     path: 'dashboard',
     component: DashboardComponent,
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, NetworkGuard],
     children: [
       { path: '', redirectTo: 'produtos', pathMatch: 'full' },
       { path: 'produtos', component: ProdutoComponent },
-      { path: 'categorias', component: CategoriaComponent },
-      { path: 'consumidores', component: ConsumersComponent },
-      { path: 'entregas', component: EntregasComponent },
-      { path: 'movimentacoes', component: MovimentacaoProdutoComponent },
-      { path: 'relatorios', component: RelatoriosComponent }
+      { path: 'categorias', component: CategoriaComponent, canActivate: [NetworkGuard] },
+      { path: 'consumidores', component: ConsumersComponent, canActivate: [NetworkGuard] },
+      { path: 'entregas', component: EntregasComponent, canActivate: [NetworkGuard] },
+      { path: 'movimentacoes', component: MovimentacaoProdutoComponent, canActivate: [NetworkGuard] },
+      { path: 'relatorios', component: RelatoriosComponent, canActivate: [NetworkGuard] }
     ],
   },
 ];

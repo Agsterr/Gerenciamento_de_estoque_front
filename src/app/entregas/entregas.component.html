@@ -1,5 +1,8 @@
 <div class="entrega-container">
-  <h2>Gerenciamento de Entregas</h2>
+  <div *ngIf="loading" class="spinner-overlay">
+    <div class="spinner" aria-label="Carregando"></div>
+  </div>
+  <h2>Gerenciamento de Entregas <span *ngIf="totalEntregasOrganizacao > 0" class="badge-inline">Total: {{ totalEntregasOrganizacao }}</span></h2>
 
   <!-- Resumo das Entregas -->
   <div class="summary-section" *ngIf="totalEntregasOrganizacao > 0">
@@ -21,10 +24,10 @@
   </div>
 
   <!-- Botões de Ação -->
-  <div class="action-buttons">
+  <div class="action-buttons toolbar">
     <button (click)="showAddForm = !showAddForm; mensagem=''; mensagemErro=''; novaEntrega={}" class="btn btn-success">
       <i [class]="showAddForm ? 'fas fa-times-circle' : 'fas fa-plus-circle'"></i>
-      {{ showAddForm ? 'Cancelar Adição' : 'Adicionar Nova Entrega' }}
+      {{ showAddForm ? 'Cancelar' : 'Adicionar' }}
     </button>
 
     <!-- Botão para mostrar o componente BuscaEntregaComponent -->
@@ -187,7 +190,7 @@
   </div>
 
 <!-- Tabela de Entregas -->
-<table class="entrega-table">
+<table class="entrega-table table table-sm table-hover table-striped align-middle">
   <colgroup>
     <col style="width: 70px">
     <col style="width: 18%">
@@ -203,9 +206,9 @@
       <th><i class="fas fa-hashtag"></i> ID</th>
       <th><i class="fas fa-user"></i> Consumidor</th>
       <th><i class="fas fa-box"></i> Produto</th>
-      <th><i class="fas fa-truck"></i> Entregador</th>
+      <th class="hide-sm"><i class="fas fa-truck"></i> Entregador</th>
       <th><i class="fas fa-layer-group"></i> Quantidade</th>
-      <th><i class="fas fa-clock"></i> Horário</th>
+      <th class="hide-sm"><i class="fas fa-clock"></i> Horário</th>
       <th><i class="fas fa-dollar-sign"></i> Total</th>
       <th><i class="fas fa-cogs"></i> Ações</th>
     </tr>
@@ -215,12 +218,12 @@
       <td data-label="ID">{{ entrega.id }}</td>
       <td data-label="Consumidor">{{ entrega.nomeConsumidor }}</td>
       <td data-label="Produto">{{ entrega.nomeProduto }}</td>
-      <td data-label="Entregador">{{ entrega.nomeEntregador }}</td>
-      <td data-label="Quantidade">{{ entrega.quantidade }}</td>
-      <td data-label="Horário">{{ formatarDataHoraBrasil(entrega.horarioEntrega) }}</td>
+      <td data-label="Entregador" class="hide-sm">{{ entrega.nomeEntregador }}</td>
+      <td data-label="Quantidade" class="text-end">{{ entrega.quantidade }}</td>
+      <td data-label="Horário" class="hide-sm">{{ formatarDataHoraBrasil(entrega.horarioEntrega) }}</td>
       
       <!-- Coluna Total -->
-      <td data-label="Total">
+      <td data-label="Total" class="text-end">
         {{ formatarTotal(entrega) }}
       </td>
 

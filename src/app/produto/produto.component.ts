@@ -11,6 +11,8 @@ import {
   FormsModule,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { fromEvent, merge, Observable } from 'rxjs';
+import { distinctUntilChanged, map, startWith } from 'rxjs/operators';
 
 @Component({
   selector: 'app-produto',
@@ -38,6 +40,11 @@ export class ProdutoComponent implements OnInit {
   editingProduto = false;
   produtoEditando: Produto | null = null;
 
+  // Novas propriedades para suporte offline/snapshot
+  isOnline$!: Observable<boolean>;
+  isOfflineSnapshot = false;
+  snapshotSavedAt?: string;
+
   constructor(
     private produtoService: ProdutoService,
     private categoriaService: CategoriaService,
@@ -55,12 +62,21 @@ export class ProdutoComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Status online/offline reativo
+    this.isOnline$ = merge(fromEvent(window, 'online'), fromEvent(window, 'offline')).pipe(
+      map(() => navigator.onLine),
+      startWith(navigator.onLine),
+      distinctUntilChanged()
+    );
+
     this.fetchProdutos();
     this.carregarCategorias();
   }
 
   fetchProdutos(page: number = 0): void {
     this.loading = true;
+    this.mensagem = '';
+    this.mensagemErro = '';
     this.produtoService.listarProdutos(page, this.pageSize).subscribe({
       next: (data) => {
         this.produtos = data.content;
@@ -69,21 +85,54 @@ export class ProdutoComponent implements OnInit {
         this.totalPages = data.totalPages || 1;
         this.totalElements = data.totalElements || this.produtos.length;
         this.applyFilter();
+        // Salva snapshot local para uso offline
+        this.saveProdutosSnapshot({
+          content: this.produtos,
+          totalPages: this.totalPages,
+          currentPage: this.currentPage,
+          totalElements: this.totalElements,
+        });
+        this.isOfflineSnapshot = false;
+        this.snapshotSavedAt = new Date().toISOString();
         this.loading = false;
       },
       error: (error: any) => {
-        this.mensagemErro = 'Erro ao carregar produtos.';
-        this.loading = false;
-        console.error('Erro ao carregar produtos:', error);
+        // Tentar fallback a partir de snapshot local
+        const snap = this.loadProdutosSnapshot();
+        if (snap) {
+          this.produtos = snap.content || [];
+          this.filteredProdutos = [...this.produtos];
+          this.currentPage = snap.currentPage ?? 0;
+          this.totalPages = snap.totalPages ?? 1;
+          this.totalElements = snap.totalElements ?? this.produtos.length;
+          this.applyFilter();
+          this.isOfflineSnapshot = true;
+          this.snapshotSavedAt = snap.savedAt;
+          this.mensagem = 'Você está offline. Exibindo dados salvos.';
+          this.loading = false;
+        } else {
+          this.mensagemErro = 'Erro ao carregar produtos.';
+          this.loading = false;
+          console.error('Erro ao carregar produtos:', error);
+        }
       }
     });
   }
 
   carregarCategorias(): void {
     this.categoriaService.listarCategorias().subscribe({
-      next: (data) => this.categorias = data.content,
+      next: (data) => {
+        this.categorias = data.content;
+        this.saveCategoriasSnapshot(this.categorias);
+      },
       error: (error: any) => {
-        this.mensagemErro = 'Erro ao carregar categorias.';
+        const catSnap = this.loadCategoriasSnapshot();
+        if (catSnap) {
+          this.categorias = catSnap;
+          this.mensagem = this.mensagem || 'Categorias carregadas do cache offline.';
+        } else {
+          this.mensagemErro = 'Erro ao carregar categorias.';
+        }
         console.error('Erro ao carregar categorias:', error);
       }
     });
@@ -101,6 +150,11 @@ export class ProdutoComponent implements OnInit {
   }
 
   toggleAddForm(): void {
+    // Bloqueia em modo offline
+    if (!navigator.onLine) {
+      this.mensagemErro = 'Sem conexão: não é possível adicionar produtos offline.';
+      return;
+    }
     this.showAddForm = true;
     this.showList = false;
     this.editingProduto = false;
@@ -119,6 +173,10 @@ export class ProdutoComponent implements OnInit {
   }
 
   createProduto(): void {
+    if (!navigator.onLine) {
+      this.mensagemErro = 'Sem conexão: não é possível adicionar produtos offline.';
+      return;
+    }
     const novo = this.produtoForm.value as Produto;
     this.loading = true;
     this.produtoService.criarProduto(novo).subscribe({
@@ -140,6 +198,10 @@ export class ProdutoComponent implements OnInit {
       this.mensagemErro = 'ID obrigatório para edição';
       return;
     }
+    if (!navigator.onLine) {
+      this.mensagemErro = 'Sem conexão: não é possível atualizar produtos offline.';
+      return;
+    }
     this.loading = true;
     this.produtoService.atualizarProduto(upd, upd.id).subscribe({
       next: () => {
@@ -156,6 +218,10 @@ export class ProdutoComponent implements OnInit {
 
   deleteProduto(id: number): void {
     if (!confirm('Confirma exclusão do produto?')) return;
+    if (!navigator.onLine) {
+      this.mensagemErro = 'Sem conexão: não é possível excluir produtos offline.';
+      return;
+    }
     this.loading = true;
     this.produtoService.deletarProduto(id).subscribe({
       next: () => {
@@ -182,6 +248,10 @@ export class ProdutoComponent implements OnInit {
   }
 
   editProduto(p: Produto): void {
+    if (!navigator.onLine) {
+      this.mensagemErro = 'Sem conexão: não é possível editar produtos offline.';
+      return;
+    }
     this.editingProduto = true;
     this.showAddForm = true;
     this.showList = false;
@@ -220,6 +290,47 @@ export class ProdutoComponent implements OnInit {
   proximaPagina(): void {
     if (this.currentPage + 1 < this.totalPages) {
       this.fetchProdutos(this.currentPage + 1);
+    }
+  }
+
+  // ===== Helpers de Snapshot Local =====
+  private saveProdutosSnapshot(data: { content: Produto[]; totalPages: number; currentPage: number; totalElements: number; }): void {
+    try {
+      const payload = { ...data, savedAt: new Date().toISOString() };
+      localStorage.setItem('produtos_snapshot', JSON.stringify(payload));
+    } catch (e) {
+      console.warn('Falha ao salvar snapshot de produtos:', e);
+    }
+  }
+
+  private loadProdutosSnapshot(): { content: Produto[]; totalPages: number; currentPage: number; totalElements: number; savedAt?: string } | null {
+    try {
+      const raw = localStorage.getItem('produtos_snapshot');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      console.warn('Falha ao ler snapshot de produtos:', e);
+      return null;
+    }
+  }
+
+  private saveCategoriasSnapshot(categorias: Categoria[]): void {
+    try {
+      const payload = { categorias, savedAt: new Date().toISOString() };
+      localStorage.setItem('categorias_snapshot', JSON.stringify(payload));
+    } catch (e) {
+      console.warn('Falha ao salvar snapshot de categorias:', e);
+    }
+  }
+
+  private loadCategoriasSnapshot(): Categoria[] | null {
+    try {
+      const raw = localStorage.getItem('categorias_snapshot');
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      return parsed?.categorias ?? null;
+    } catch (e) {
+      console.warn('Falha ao ler snapshot de categorias:', e);
+      return null;
     }
   }
 }

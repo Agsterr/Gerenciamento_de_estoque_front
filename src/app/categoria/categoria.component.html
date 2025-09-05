@@ -5,6 +5,15 @@
     <i class="fas fa-list-alt"></i> Lista de Categorias
   </h2>
 
+  <!-- Fallback offline por rota -->
+  <ng-container *ngIf="isOfflineSnapshot">
+    <div class="alert alert-info" role="status" aria-live="polite">
+      <i class="fas fa-cloud-download-alt"></i>
+      Você está offline. Exibindo snapshot salvo das categorias.
+      <small style="margin-left:8px">Atualizado em: {{ snapshotSavedAt | date:'short' }}</small>
+    </div>
+  </ng-container>
+
   <!-- Resumo das Categorias -->
   <div class="summary-section" *ngIf="totalElements > 0">
     <div class="summary-card">
@@ -65,9 +74,12 @@
         />
       </div>
 
-      <button type="submit" [disabled]="categoriaForm.invalid" class="btn btn--salvar">
+      <button type="submit" [disabled]="categoriaForm.invalid || (isOnline$ | async) === false" class="btn btn--salvar">
         <i class="fas fa-save"></i> Salvar
       </button>
+      <small *ngIf="(isOnline$ | async) === false" style="margin-left:8px; color:#6b7280">
+        Ações de escrita indisponíveis offline.
+      </small>
     </form>
   </div>
 
@@ -99,7 +111,7 @@
         <tr *ngFor="let categoria of filteredCategorias">
           <td data-label="Nome">{{ categoria.nome }}</td>
           <td data-label="Ações">
-            <button type="button" class="btn btn-danger btn-sm" (click)="deletarCategoria(categoria.id)" title="Excluir">
+            <button type="button" class="btn btn-danger btn-sm" (click)="deletarCategoria(categoria.id)" title="Excluir" [disabled]="(isOnline$ | async) === false">
               <i class="fas fa-trash-alt"></i>
             </button>
           </td>
@@ -140,4 +152,9 @@
     </div>
 
   </div>
+</div>
+
+<!-- Overlay de carregamento -->
+<div *ngIf="loading" class="spinner-overlay">
+  <div class="spinner" aria-label="Carregando" role="status"></div>
 </div>

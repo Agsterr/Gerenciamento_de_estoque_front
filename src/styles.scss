@@ -36,3 +36,38 @@ a:hover {
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+/* ===== Global Loading Overlay & Spinner (shared) ===== */
+.spinner-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(1200px 600px at 50% 50%, rgba(0,0,0,.35), rgba(0,0,0,.55));
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  z-index: 1200; /* above headers/cards */
+}
+
+.spinner {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.25);
+  border-top-color: #10b981; /* emerald */
+  border-right-color: rgba(255, 255, 255, 0.25);
+  border-bottom-color: rgba(255, 255, 255, 0.25);
+  animation: spin .9s linear infinite;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.12), 0 0 18px rgba(16, 185, 129, 0.35);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Optional: dark mode tweak if app has dark theme on body */
+body.dark .spinner-overlay {
+  background: radial-gradient(1200px 600px at 50% 50%, rgba(0,0,0,.45), rgba(0,0,0,.7));
+}

@@ -9,6 +9,7 @@ import { PageEntregaResponse } from '../models/src/app/models/entrega/PageEntreg
 import { EntregaRequest } from '../models/src/app/models/entrega/entrega-request.model';
 import { BuscaEntregaComponent } from './busca-entrega/busca-entrega.component';
 import { AuthService } from '../services/auth.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-entregas',
@@ -49,6 +50,20 @@ export class EntregasComponent implements OnInit {
   idEntregaParaEditar: number | null = null;
   orgId: number | null = null;
 
+  // Estado de carregamento compartilhado (overlay)
+  loading: boolean = false;
+  private activeRequests = 0;
+  private beginLoading(): void {
+    this.activeRequests++;
+    this.loading = true;
+  }
+  private endLoading(): void {
+    this.activeRequests = Math.max(0, this.activeRequests - 1);
+    if (this.activeRequests === 0) {
+      this.loading = false;
+    }
+  }
+
   constructor(
     private entregasService: EntregasService,
     private produtoService: ProdutoService,
@@ -68,15 +83,18 @@ export class EntregasComponent implements OnInit {
 
   // Método para buscar o total de entregas da organização
   fetchTotalEntregasOrganizacao(): void {
-    this.entregasService.getTotalEntregasRealizadas().subscribe({
-      next: (total) => {
-        this.totalEntregasOrganizacao = total;
-        console.log('Total de entregas da organização:', total);
-      },
-      error: (error) => {
-        console.error('Erro ao buscar total de entregas:', error);
-      }
-    });
+    this.beginLoading();
+    this.entregasService.getTotalEntregasRealizadas()
+      .pipe(finalize(() => this.endLoading()))
+      .subscribe({
+        next: (total) => {
+          this.totalEntregasOrganizacao = total;
+          console.log('Total de entregas da organização:', total);
+        },
+        error: (error) => {
+          console.error('Erro ao buscar total de entregas:', error);
+        }
+      });
   }
 
   // Método para capturar o evento emitido pelo BuscaEntregaComponent
@@ -89,40 +107,47 @@ export class EntregasComponent implements OnInit {
 
   // Método para carregar os produtos
   carregarProdutos(): void {
-    this.produtoService.listarProdutos(0, 100).subscribe({
-      next: data => this.produtos = data.content,
-      error: () => this.mensagemErro = 'Erro ao carregar produtos.'
-    });
+    this.beginLoading();
+    this.produtoService.listarProdutos(0, 100)
+      .pipe(finalize(() => this.endLoading()))
+      .subscribe({
+        next: data => this.produtos = data.content,
+        error: () => this.mensagemErro = 'Erro ao carregar produtos.'
+      });
   }
 
   // Método para carregar os consumidores
   carregarConsumidores(): void {
-    this.consumidorService.listarConsumidores().subscribe({
-      next: data => this.consumidores = data,
-      error: () => this.mensagemErro = 'Erro ao carregar consumidores.'
-    });
+    this.beginLoading();
+    this.consumidorService.listarConsumidores()
+      .pipe(finalize(() => this.endLoading()))
+      .subscribe({
+        next: data => this.consumidores = data,
+        error: () => this.mensagemErro = 'Erro ao carregar consumidores.'
+      });
   }
 
   // Método para buscar entregas e aplicar paginação
   fetchEntregas(page: number): void {
-    this.entregasService.listarEntregas(page, this.pageSize).subscribe({
-      next: (data: PageEntregaResponse) => {
-        this.entregas = data.content;  // A lista de entregas
-        this.currentPage = data.number;  // Número da página atual
-        this.totalPages = data.totalPages;  // Total de páginas
-        this.totalElements = data.totalElements; // Total de elementos
-        
-        // Debug: verificar se o total está sendo retornado
-        console.log('Entregas carregadas:', this.entregas);
-        
-        // Aplica o filtro
-        this.applyFilter();
-      },
-      error: () => {
-        this.mensagemErro = 'Erro ao carregar entregas.';
-        console.error(this.mensagemErro);
-      }
-    });
+    this.beginLoading();
+    this.entregasService.listarEntregas(page, this.pageSize)
+      .pipe(finalize(() => this.endLoading()))
+      .subscribe({
+        next: (data: PageEntregaResponse) => {
+          this.entregas = data.content;  // A lista de entregas
+          this.currentPage = data.number;  // Número da página atual
+          this.totalPages = data.totalPages;  // Total de páginas
+          this.totalElements = data.totalElements; // Total de elementos
+          // Debug: verificar se o total está sendo retornado
+          console.log('Entregas carregadas:', this.entregas);
+          // Aplica o filtro
+          this.applyFilter();
+        },
+        error: () => {
+          this.mensagemErro = 'Erro ao carregar entregas.';
+          console.error(this.mensagemErro);
+        }
+      });
   }
 
   // Formatar data e hora no formato Brasileiro
@@ -187,14 +212,17 @@ export class EntregasComponent implements OnInit {
       horarioEntrega: this.novaEntrega.horarioEntrega
     };
 
-    this.entregasService.criarEntrega(payload).subscribe({
-      next: response => {
-        this.mensagem = response.mensagemEstoqueBaixo || 'Entrega criada com sucesso!';
-        this.showAddForm = false;
-        this.fetchEntregas(this.currentPage);
-      },
-      error: () => this.mensagemErro = 'Erro ao registrar entrega.'
-    });
+    this.beginLoading();
+    this.entregasService.criarEntrega(payload)
+      .pipe(finalize(() => this.endLoading()))
+      .subscribe({
+        next: response => {
+          this.mensagem = response.mensagemEstoqueBaixo || 'Entrega criada com sucesso!';
+          this.showAddForm = false;
+          this.fetchEntregas(this.currentPage);
+        },
+        error: () => this.mensagemErro = 'Erro ao registrar entrega.'
+      });
   }
 
   // Método para editar a entrega
@@ -228,16 +256,19 @@ export class EntregasComponent implements OnInit {
     };
 
     if (this.idEntregaParaEditar !== null) {
-      this.entregasService.editarEntrega(this.idEntregaParaEditar, payload).subscribe({
-        next: () => {
-          this.mensagem = 'Entrega atualizada com sucesso!';
-          this.showEditForm = false;
-          this.fetchEntregas(this.currentPage);
-        },
-        error: () => {
-          this.mensagemErro = 'Erro ao atualizar entrega.';
-        }
-      });
+      this.beginLoading();
+      this.entregasService.editarEntrega(this.idEntregaParaEditar, payload)
+        .pipe(finalize(() => this.endLoading()))
+        .subscribe({
+          next: () => {
+            this.mensagem = 'Entrega atualizada com sucesso!';
+            this.showEditForm = false;
+            this.fetchEntregas(this.currentPage);
+          },
+          error: () => {
+            this.mensagemErro = 'Erro ao atualizar entrega.';
+          }
+        });
     }
   }
 
@@ -245,26 +276,32 @@ export class EntregasComponent implements OnInit {
   deleteEntrega(id: number): void {
     if (!confirm('Deseja realmente excluir esta entrega?')) return;
 
-    this.entregasService.deletarEntrega(id).subscribe({
-      next: () => {
-        this.entregas = this.entregas.filter(e => e.id !== id);
-        this.applyFilter();  // Aplica o filtro após a exclusão
-      },
-      error: () => alert('Erro ao deletar entrega.')
-    });
+    this.beginLoading();
+    this.entregasService.deletarEntrega(id)
+      .pipe(finalize(() => this.endLoading()))
+      .subscribe({
+        next: () => {
+          this.entregas = this.entregas.filter(e => e.id !== id);
+          this.applyFilter();  // Aplica o filtro após a exclusão
+        },
+        error: () => alert('Erro ao deletar entrega.')
+      });
   }
 
   // Buscar entregas por dia
   fetchEntregasPorDia(dia: string): void {
-    this.entregasService.porDia(dia).subscribe({
-      next: (entregas: EntregaResponse[]) => {
-        this.porDia = entregas;
-      },
-      error: (error) => {
-        this.mensagemErro = 'Erro ao buscar entregas para o dia especificado!';
-        console.error(error);
-      }
-    });
+    this.beginLoading();
+    this.entregasService.porDia(dia)
+      .pipe(finalize(() => this.endLoading()))
+      .subscribe({
+        next: (entregas: EntregaResponse[]) => {
+          this.porDia = entregas;
+        },
+        error: (error) => {
+          this.mensagemErro = 'Erro ao buscar entregas para o dia especificado!';
+          console.error(error);
+        }
+      });
   }
 
   // Navegar para a próxima página

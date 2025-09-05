@@ -33,6 +33,13 @@
             <mat-icon>dashboard</mat-icon>
             Dashboard
           </a>
+
+          <!-- Indicador de fila pendente -->
+          <button mat-button class="queue-indicator" aria-label="Operações pendentes para sincronização" title="Operações pendentes para sincronização">
+            <mat-icon>sync_problem</mat-icon>
+            <span class="badge" *ngIf="queueCount > 0">{{ queueCount }}</span>
+          </button>
+
           <button mat-button [matMenuTriggerFor]="menu" aria-label="Menu do usuário" class="user-button">
             <span class="avatar">{{ userName.charAt(0) | uppercase }}</span>
             <span class="user-name">{{ userName }}</span>
@@ -52,6 +59,15 @@
     </button>
   </div>
 </header>
+
+<!-- Banner offline -->
+<ng-container *ngIf="(online$ | async) === false">
+  <div class="offline-banner" role="status" aria-live="polite">
+    <mat-icon>cloud_off</mat-icon>
+    Você está offline. Algumas funcionalidades podem não estar disponíveis.
+  </div>
+</ng-container>
+
 <div class="router-container main-content">
   <router-outlet></router-outlet>
 </div>

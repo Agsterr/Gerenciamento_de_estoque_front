@@ -122,6 +122,24 @@
     padding: 0 8px;
   }
 }
+.offline-banner {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fde68a; // amarelo suave
+  color: #7c2d12;      // marrom escuro para bom contraste
+  padding: 10px 16px;
+  box-shadow: 0 2px 8px rgba(124,45,18,0.15);
+  z-index: 99;
+  font-weight: 600;
+}
+.offline-banner mat-icon {
+  color: #b45309;
+}
 @media (max-width: 700px) {
   .navbar-content {
     flex-direction: column;
@@ -166,4 +184,35 @@
   border-radius: 0;
   background: transparent;
   max-width: none;
+}
+.queue-indicator {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 4px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  color: #374151;
+}
+.queue-indicator:hover {
+  background: #f1f5fa;
+}
+.queue-indicator mat-icon {
+  color: #f59e0b; // amber
+}
+.queue-indicator .badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: #ef4444; // red-500
+  color: #fff;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  font-weight: 700;
 }

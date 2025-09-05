@@ -7,6 +7,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { PageCategoriaResponse } from '../models/page-categoria-response.model';
+import { fromEvent, merge, Observable, of } from 'rxjs';
+import { map, startWith, distinctUntilChanged } from 'rxjs/operators';
 
 @Component({
   selector: 'app-categoria',
@@ -18,7 +20,6 @@ import { PageCategoriaResponse } from '../models/page-categoria-response.model';
 export class CategoriaComponent implements OnInit {
   categoriaForm: FormGroup;
   categorias: Categoria[] = [];
-  // Adicionado: lista filtrada e termo de busca
   filteredCategorias: Categoria[] = [];
   searchTerm: string = '';
   mensagem: string = '';
@@ -31,6 +32,15 @@ export class CategoriaComponent implements OnInit {
   number = 0;
   totalElements = 0;
   totalPages = 0;
+
+  // Suporte offline
+  isOnline$: Observable<boolean> = merge(
+    fromEvent(window, 'online').pipe(map(() => true)),
+    fromEvent(window, 'offline').pipe(map(() => false))
+  ).pipe(startWith(navigator.onLine), distinctUntilChanged());
+  isOfflineSnapshot = false;
+  snapshotSavedAt?: string;
+  loading = false;
 
   constructor(
     private categoriaService: CategoriaService,
@@ -54,23 +64,50 @@ export class CategoriaComponent implements OnInit {
     }
   }
 
-  /** Carrega categorias com paginação */
+  /** Snapshot helpers (Indexed LocalStorage) */
+  private saveCategoriasSnapshot(categorias: Categoria[]) {
+    const snap = { data: categorias, savedAt: new Date().toISOString() };
+    localStorage.setItem('categorias_snapshot', JSON.stringify(snap));
+  }
+  private loadCategoriasSnapshot(): { data: Categoria[]; savedAt: string } | null {
+    const raw = localStorage.getItem('categorias_snapshot');
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch { return null; }
+  }
+
+  /** Carrega categorias com paginação e fallback offline */
   carregarCategorias(pagina: number = 0): void {
     this.limparMensagens();
+    this.loading = true;
 
     this.categoriaService.listarCategorias(pagina, this.size).subscribe({
       next: (data: PageCategoriaResponse) => {
-        this.categorias = data.content; // Apenas o array de categorias
-        this.number = data.number; // Número da página atual
-        this.totalPages = data.totalPages; // Número total de páginas
-        this.totalElements = data.totalElements; // Número total de elementos
-        this.size = data.size; // Tamanho da página
-        // Aplica o filtro após carregar
+        this.categorias = data.content;
+        this.number = data.number;
+        this.totalPages = data.totalPages;
+        this.totalElements = data.totalElements;
+        this.size = data.size;
         this.applyFilter();
+        // Snapshot e estado
+        this.isOfflineSnapshot = false;
+        this.snapshotSavedAt = new Date().toISOString();
+        this.saveCategoriasSnapshot(this.categorias);
+        this.loading = false;
       },
       error: (error: HttpErrorResponse) => {
-        this.mensagemErro = 'Erro ao carregar categorias.';
+        // Fallback: snapshot local se offline
+        const snap = this.loadCategoriasSnapshot();
+        if (snap) {
+          this.categorias = snap.data || [];
+          this.applyFilter();
+          this.isOfflineSnapshot = true;
+          this.snapshotSavedAt = snap.savedAt;
+          this.mensagem = 'Você está offline. Exibindo categorias salvas.';
+        } else {
+          this.mensagemErro = 'Erro ao carregar categorias.';
+        }
         console.error('Erro ao carregar categorias:', error);
+        this.loading = false;
       }
     });
   }
@@ -78,7 +115,6 @@ export class CategoriaComponent implements OnInit {
   onPageSizeChange() {
     this.carregarCategorias(0);
   }
-
 
   toggleNovaCategoriaForm(): void {
     this.showNovaCategoriaInput = !this.showNovaCategoriaInput;
@@ -89,28 +125,37 @@ export class CategoriaComponent implements OnInit {
   criarCategoria(): void {
     this.limparMensagens();
 
-    if (this.categoriaForm.valid) {
-      const nome = this.categoriaForm.get('nome')?.value.trim();
-      const descricao = this.categoriaForm.get('descricao')?.value?.trim() || '';
+    if (!navigator.onLine) {
+      this.mensagemErro = 'Sem conexão: não é possível criar categorias offline.';
+      this.mensagemTipo = 'erro';
+      return;
+    }
 
-      if (this.categorias.some(cat => cat.nome.toLowerCase() === nome.toLowerCase())) {
+    if (this.categoriaForm.valid) {
+      const nome = (this.categoriaForm.get('nome')?.value || '').trim();
+      const descricao = (this.categoriaForm.get('descricao')?.value || '').trim();
+
+      if (this.categorias.some(cat => (cat.nome || '').toLowerCase() === nome.toLowerCase())) {
         this.mensagemErro = 'Categoria já existe!';
         this.mensagemTipo = 'erro';
         return;
       }
 
+      this.loading = true;
       this.categoriaService.criarCategoria(nome, descricao).subscribe({
         next: () => {
           this.mensagem = 'Categoria criada com sucesso!';
           this.mensagemTipo = 'sucesso';
           this.categoriaForm.reset();
           this.showNovaCategoriaInput = false;
-          this.carregarCategorias(this.number); // recarrega a página atual
+          this.carregarCategorias(this.number);
+          this.loading = false;
         },
         error: (error: HttpErrorResponse) => {
           this.mensagemErro = 'Erro ao criar categoria.';
           console.error('Erro ao criar categoria:', error);
           this.mensagemTipo = 'erro';
+          this.loading = false;
         }
       });
     } else {
@@ -120,17 +165,26 @@ export class CategoriaComponent implements OnInit {
   }
 
   deletarCategoria(id: number): void {
+    if (!navigator.onLine) {
+      this.mensagemErro = 'Sem conexão: não é possível excluir categorias offline.';
+      this.mensagemTipo = 'erro';
+      return;
+    }
+
     if (confirm('Tem certeza que deseja deletar esta categoria?')) {
+      this.loading = true;
       this.categoriaService.deletarCategoria(id).subscribe({
         next: () => {
           this.mensagem = 'Categoria deletada com sucesso!';
           this.mensagemTipo = 'sucesso';
-          this.carregarCategorias(this.number); // atualiza a lista da página
+          this.carregarCategorias(this.number);
+          this.loading = false;
         },
         error: (error: HttpErrorResponse) => {
           this.mensagemErro = 'Erro ao deletar categoria.';
           console.error('Erro ao deletar categoria:', error);
           this.mensagemTipo = 'erro';
+          this.loading = false;
         }
       });
     }
